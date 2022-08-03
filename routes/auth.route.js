@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { infoUser, login, register, refreshToken, logout } from '../controllers/auth.controller.js';
 import { requireRefreshToken } from '../middlewares/requireRefreshToken.js';
 import { requireToken } from '../middlewares/requireToken.js';
-import { bodyLoginValidator, bodyRegisterValidator } from '../middlewares/validatorManager.js';
+import { bodyLoginValidator, bodyRegisterValidator } from '../middlewares/authValidatorManager.js';
 
 const router = Router();
 
