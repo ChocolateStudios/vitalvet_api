@@ -38,7 +38,7 @@ class EventTypes extends Model {
     }
  }, {
     sequelize,
-    modelName: 'Profile',
+    modelName: 'EventTypes',
     timestamps: false
  });
 
