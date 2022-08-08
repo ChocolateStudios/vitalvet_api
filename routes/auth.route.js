@@ -1,31 +1,10 @@
 import { Router } from 'express';
-import { infoUser, login, register, refreshToken, logout } from '../controllers/auth.controller.js';
+import { login, register, refreshToken, logout, deleteAccount } from '../controllers/auth.controller.js';
 import { requireRefreshToken } from '../middlewares/requireRefreshToken.js';
 import { requireToken } from '../middlewares/requireToken.js';
 import { bodyLoginValidator, bodyRegisterValidator } from '../middlewares/authValidatorManager.js';
 
 const router = Router();
-
-/**
- * @swagger
- * components:
- *  schemas:
- *      TokenResponse:
- *        type: object
- *        properties:
- *         token:
- *          type: string
- *         expiresIn:
- *          type: integer
- *        required:
- *          - token
- *          - expiresIn
- *        example:
- *          token: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
- *          expiresIn: 900
- */
-
-
 
 /**
  * @swagger
@@ -79,21 +58,12 @@ router.post('/login', bodyLoginValidator, login);
 
 
 
-// /**
-//  * 
-//  */
-// router.get('/protected', requireToken, infoUser);
-
-
-
 /**
  * @swagger
  * /api/v1/auth/refresh:
  *  get:
- *      summary: Refresh a token
+ *      summary: Refresh the token of logged in user
  *      tags: [User]
- *      security:
- *      - bearerAuth: []
  *      responses:
  *          200:
  *              description: Token refreshed
@@ -103,7 +73,7 @@ router.post('/login', bodyLoginValidator, login);
  *                          type: object
  *                          $ref: '#/components/schemas/TokenResponse'
  */
-router.get('/refresh', requireRefreshToken, refreshToken)
+router.get('/refresh', requireRefreshToken, refreshToken);
 
 
 
@@ -111,10 +81,8 @@ router.get('/refresh', requireRefreshToken, refreshToken)
  * @swagger
  * /api/v1/auth/logout:
  *  get:
- *      summary: Logout a user
+ *      summary: Logout the logged in user
  *      tags: [User]
- *      security:
- *      - bearerAuth: []
  *      responses:
  *          200:
  *              description: User logged out
@@ -126,6 +94,29 @@ router.get('/refresh', requireRefreshToken, refreshToken)
  *                              message: "Logout successfully"
  * 
  */
-router.get('/logout', logout)
+router.get('/logout', logout);
+
+
+
+/**
+ * @swagger
+ * /api/v1/auth/:
+ *  delete:
+ *      summary: Delete logged in user
+ *      tags: [User]
+ *      security:
+ *          - BearerAuth: []
+ *      responses:
+ *          200:
+ *              description: User deleted
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          example:
+ *                              message: "Account deleted"
+ * 
+ */
+router.delete('/', requireToken, deleteAccount);
 
 export default router;

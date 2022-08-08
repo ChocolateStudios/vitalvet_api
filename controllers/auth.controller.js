@@ -1,68 +1,61 @@
 import User from "../models/User.js";
-import ExceptionResponse from "../exceptions/exceptionResponse.js";
+import { customException, exceptionResponse } from "../exceptions/exceptionResponse.js";
 import { generateRefreshToken, generateToken } from "../utils/tokenManager.js";
+import { AuthService } from "../services/auth.service.js";
 
 export const register = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = new User({ email, password });
-        await user.save();
-
-        const { token, expiresIn } = generateToken(user.id);
-        generateRefreshToken(user.id, res);
-
+        const { token, expiresIn } = await AuthService.register(email, password, res);
         return res.status(201).json({ token, expiresIn });
     } catch (error) {
-        console.log(error);
-        const { code, message } = ExceptionResponse(error);
-        return res.status(code).json(message);
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
     }
 };
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ where: { email } });
-        if (!user)
-            return res.status(404).json({ message: "Invalid email or password" });
-
-        const passwordCompareResult = await user.comparePassword(password);
-
-        if (!passwordCompareResult)
-            return res.status(404).json({ message: "Invalid email or password" });
-
-        const { token, expiresIn } = generateToken(user.id);
-        generateRefreshToken(user.id, res);
-
+        const { token, expiresIn } = await AuthService.login(email, password, res);
         return res.status(200).json({ token, expiresIn });
     } catch (error) {
-        console.log(error);
-        const { code, message } = ExceptionResponse(error);
-        return res.status(code).json(message);
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
     }
 };
-
-export const infoUser = async (req, res) => {
-    try {
-        const user = await User.findOne({ where: { id: req.uid } });
-        return res.json({ user });
-    } catch (error) {
-
-    }
-}
 
 export const refreshToken = (req, res) => {
 
     try {
-        const { token, expiresIn } = generateToken(req.uid);
-        return res.json({ token, expiresIn });
+        const { token, expiresIn } = AuthService.refreshToken(req.uid);
+        return res.status(200).json({ token, expiresIn });
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'server error' });
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
     }
-}
+};
 
 export const logout = (req, res) => {
-    res.clearCookie("refreshToken");
-    return res.status(200).json({ message: "Logout successfully" });
+    try {
+        AuthService.logout(res);
+        return res.status(200).json({ message: "Logout successfully" });
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
+
+export const deleteAccount = async (req, res) => {
+    try {
+        const successful = AuthService.deleteAccount(req.uid);
+        
+        if (!successful)
+            throw new customException();
+
+        return res.status(200).json({ message: "Account deleted" });
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
 }

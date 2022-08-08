@@ -19,6 +19,10 @@ import Constants from '../constants/constants.js';
  *          type: string
  *         admin:
  *          type: boolean
+ *         college:
+ *          type: string
+ *         review:
+ *          type: string
  *         user_id:
  *          type: integer
  *        required:
@@ -26,6 +30,8 @@ import Constants from '../constants/constants.js';
  *          - lastname
  *          - birthday
  *          - admin
+ *          - college
+ *          - review
  *          - user_id
  *        example:
  *          name: Manuel
@@ -33,13 +39,15 @@ import Constants from '../constants/constants.js';
  *          birthday: 2020-01-01
  *          picture: http://www.example.com/image.png
  *          admin: false
+ *          college: Universidad Nacional de Colombia
+ *          review: Lorem ipsum dolor sit amet, consectetur
  *          user_id: 1
  */
 
 class Profile extends Model {
- }
+}
 
- Profile.init({
+Profile.init({
     name: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
@@ -67,16 +75,26 @@ class Profile extends Model {
         allowNull: false,
         notEmpty: true
     },
-    user_id: {
-        type: DataTypes.INTEGER,
+    college: {
+        type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
-        references: {
-            model: 'Users',
-            key: 'id',
-            onDelete: 'cascade'
-        }
+        notEmpty: true
+    },
+    review: {
+        type: DataTypes.STRING(Constants.MULTILINE_SIZE),
+        allowNull: false,
+        notEmpty: true
+    },
+    // user_id: {
+    //     type: DataTypes.INTEGER,
+    //     allowNull: false,
+    //     references: {
+    //         model: 'Users',
+    //         key: 'id',
+    //         onDelete: 'cascade'
+    //     }
 
-    }
+    // }
 }, {
     sequelize,
     modelName: 'Profile',

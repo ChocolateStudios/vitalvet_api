@@ -17,11 +17,17 @@ export const bodyProfileValidator = [
         .isURL(),
     body('picture', `Picture must be at most ${Constants.LINK_SIZE} characters`)
         .isLength({ max: Constants.LINK_SIZE }),
-    body('admin', 'Admin must be a boolean')
+    // body('admin', 'Admin must be a boolean')
+    //     .trim()
+    //     .isBoolean(),
+    body('college', `College must be at most ${Constants.ONE_LINE_SIZE} characters`)
         .trim()
-        .isBoolean(),
-    body('user_id', 'User id must be an integer')
+        .isLength({ max: Constants.ONE_LINE_SIZE }),
+    body('review', `Review must be at most ${Constants.MULTILINE_SIZE} characters`)
         .trim()
-        .isInt(),
+        .isLength({ max: Constants.MULTILINE_SIZE }),
+    // body('user_id', 'User id must be an integer')
+    //     .trim()
+    //     .isInt(),
     validationResultExpress
 ]

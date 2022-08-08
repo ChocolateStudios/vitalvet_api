@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 export const requireToken = (req, res, next) => {
 
     try {
+        // console.log('Headers');
+        // console.log(req.headers);
         let token = req.headers?.authorization
 
         if (!token) throw new Error("Not authorized");

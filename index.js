@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { sequelize } from "./database/connectdb.js";
 import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
@@ -8,8 +7,10 @@ import swaggerJsDoc from "swagger-jsdoc";
 
 import authRouter from "./routes/auth.route.js";
 import profilesRouter from "./routes/profiles.route.js";
+import patientsRouter from "./routes/patients.route.js";
 
-await sequelize.sync();
+import "./utils/dbContext.js";
+
 const app = express();
 
 const whiteList = [process.env.ORIGIN1, process.env.ORIGIN2, process.env.ORIGIN3];
@@ -40,12 +41,14 @@ const swaggerSpec = {
             }
         ],
     },
-    apis: ["./routes/*.route.js", "./models/*.js"],
+    apis: ["./routes/*.route.js", "./models/*.js", "./utils/*.js"],
 }
+
 app.use('/api/v1/docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)));
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/profiles', profilesRouter);
+app.use('/api/v1/profiles', patientsRouter);
 
 app.use(express.static('public'));
 
