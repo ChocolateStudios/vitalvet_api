@@ -25,6 +25,20 @@ export const login = async (req, res) => {
     }
 };
 
+export const deleteAccount = async (req, res) => {
+    try {
+        const successful = AuthService.deleteAccount(req.uid);
+        
+        if (!successful)
+            throw new customException();
+
+        return res.status(200).json({ message: "Account deleted" });
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+}
+
 export const refreshToken = (req, res) => {
 
     try {
@@ -45,17 +59,3 @@ export const logout = (req, res) => {
         return res.status(code).json({ message });
     }
 };
-
-export const deleteAccount = async (req, res) => {
-    try {
-        const successful = AuthService.deleteAccount(req.uid);
-        
-        if (!successful)
-            throw new customException();
-
-        return res.status(200).json({ message: "Account deleted" });
-    } catch (error) {
-        const { code, message } = exceptionResponse(error);
-        return res.status(code).json({ message });
-    }
-}

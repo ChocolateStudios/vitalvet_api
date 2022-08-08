@@ -3,31 +3,49 @@ import { validationResultExpress } from "./validationCommon.js";
 import Constants from '../constants/constants.js';
 
 export const bodyProfileValidator = [
-    body('name', `Name must be at most ${Constants.ONE_LINE_SIZE} characters`)
+    body('name')
         .trim()
-        .isLength({ max: Constants.ONE_LINE_SIZE }),
-    body('lastname', `Lastname must be at most ${Constants.ONE_LINE_SIZE} characters`)
+        .notEmpty()
+        .withMessage('Name is required')
+        .isLength({ max: Constants.ONE_LINE_SIZE })
+        .withMessage(`Name must be at most ${Constants.ONE_LINE_SIZE} characters`),
+    body('lastname')
         .trim()
-        .isLength({ max: Constants.ONE_LINE_SIZE }),
-    body('birthday', 'Birthday must be a date')
+        .notEmpty()
+        .withMessage('Lastname is required')
+        .isLength({ max: Constants.ONE_LINE_SIZE })
+        .withMessage(`Lastname must be at most ${Constants.ONE_LINE_SIZE} characters`),
+    body('birthday')
         .trim()
-        .isDate(),
-    body('picture', 'Picture must be a url')
+        .notEmpty()
+        .withMessage('Birthday is required')
+        .isDate()
+        .withMessage('Birthday must be a date'),
+    body('picture')
+        .if(body('picture').exists())
         .trim()
-        .isURL(),
-    body('picture', `Picture must be at most ${Constants.LINK_SIZE} characters`)
-        .isLength({ max: Constants.LINK_SIZE }),
-    // body('admin', 'Admin must be a boolean')
-    //     .trim()
-    //     .isBoolean(),
-    body('college', `College must be at most ${Constants.ONE_LINE_SIZE} characters`)
+        .notEmpty()
+        .withMessage('Picture is required')
+        .isURL()
+        .withMessage('Picture must be a url')
+        .isLength({ max: Constants.LINK_SIZE })
+        .withMessage(`Picture must be at most ${Constants.LINK_SIZE} characters`),
+    body('admin')
+        .if(body('admin').exists())
         .trim()
-        .isLength({ max: Constants.ONE_LINE_SIZE }),
-    body('review', `Review must be at most ${Constants.MULTILINE_SIZE} characters`)
+        .isBoolean()
+        .withMessage('Admin must be a boolean'),
+    body('college')
         .trim()
-        .isLength({ max: Constants.MULTILINE_SIZE }),
-    // body('user_id', 'User id must be an integer')
-    //     .trim()
-    //     .isInt(),
+        .notEmpty()
+        .withMessage('College is required')
+        .isLength({ max: Constants.ONE_LINE_SIZE })
+        .withMessage(`College must be at most ${Constants.ONE_LINE_SIZE} characters`),
+    body('review')
+        .trim()
+        .notEmpty()
+        .withMessage('Review is required')
+        .isLength({ max: Constants.MULTILINE_SIZE })
+        .withMessage(`Review must be at most ${Constants.MULTILINE_SIZE} characters`),
     validationResultExpress
 ]

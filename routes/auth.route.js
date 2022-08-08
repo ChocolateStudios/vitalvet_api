@@ -60,6 +60,29 @@ router.post('/login', bodyLoginValidator, login);
 
 /**
  * @swagger
+ * /api/v1/auth/:
+ *  delete:
+ *      summary: Delete logged in user
+ *      tags: [User]
+ *      security:
+ *          - BearerAuth: []
+ *      responses:
+ *          200:
+ *              description: User deleted
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          example:
+ *                              message: "Account deleted"
+ * 
+ */
+router.delete('/', requireToken, deleteAccount);
+
+
+
+/**
+ * @swagger
  * /api/v1/auth/refresh:
  *  get:
  *      summary: Refresh the token of logged in user
@@ -95,28 +118,5 @@ router.get('/refresh', requireRefreshToken, refreshToken);
  * 
  */
 router.get('/logout', logout);
-
-
-
-/**
- * @swagger
- * /api/v1/auth/:
- *  delete:
- *      summary: Delete logged in user
- *      tags: [User]
- *      security:
- *          - BearerAuth: []
- *      responses:
- *          200:
- *              description: User deleted
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          example:
- *                              message: "Account deleted"
- * 
- */
-router.delete('/', requireToken, deleteAccount);
 
 export default router;

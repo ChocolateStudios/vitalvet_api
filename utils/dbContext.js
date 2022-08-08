@@ -1,20 +1,24 @@
 import { sequelize } from "../database/connectdb.js";
+import Patient from "../models/Patient.js";
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 
 // One-to-one relationship between User and Profile with foreign key 'user_id' in profile
-User.hasOne(Profile, { foreignKey: "user_id", onDelete: "CASCADE", onUpdate: "CASCADE" });
+User.hasOne(Profile, { foreignKey: "user_id", onDelete: "CASCADE", onUpdate: "CASCADE", as: "profile" });
+Profile.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE", onUpdate: "CASCADE", as: "user" });
 
 
 
 
 // Ensure that the tables are created in the database
+// await Patient.sync({ force: true });
 await sequelize.sync();
+// await sequelize.sync({ force: true });
 
 // Create default instances
 
 (async () => {
-    const userAdminExists = await User.findOne({ where: { email: "adminUser" } });
+    const userAdminExists = await User.findOne({ where: { email: "admin@user.com" } });
 
     if (userAdminExists)
         return;

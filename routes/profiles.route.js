@@ -122,7 +122,7 @@ router.get('/', requireToken, getProfile);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Profile'
+ *                          $ref: '#/components/schemas/ProfileListResponse'
  *          401:
  *              $ref: '#/components/responses/UnauthorizedError'
  */

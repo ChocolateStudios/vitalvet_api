@@ -9,6 +9,8 @@ import Constants from '../constants/constants.js';
  *      Profile:
  *        type: object
  *        properties:
+ *         id:
+ *          type: integer
  *         name:
  *          type: string
  *         lastname:
@@ -23,17 +25,20 @@ import Constants from '../constants/constants.js';
  *          type: string
  *         review:
  *          type: string
- *         user_id:
- *          type: integer
+ *         user:
+ *          type: object
+ *          $ref: '#/components/schemas/ProfileUser'
  *        required:
+ *          - id
  *          - name
  *          - lastname
  *          - birthday
  *          - admin
  *          - college
  *          - review
- *          - user_id
+ *          - user
  *        example:
+ *          id: 1
  *          name: Manuel
  *          lastname: Quispe
  *          birthday: 2020-01-01
@@ -41,7 +46,9 @@ import Constants from '../constants/constants.js';
  *          admin: false
  *          college: Universidad Nacional de Colombia
  *          review: Lorem ipsum dolor sit amet, consectetur
- *          user_id: 1
+ *          user:
+ *              id: 1
+ *              email: hello@example.com
  */
 
 class Profile extends Model {

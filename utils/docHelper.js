@@ -60,6 +60,26 @@
  *          college: Universidad Nacional de Colombia
  *          review: Lorem ipsum dolor sit amet, consectetur
  * 
+ *      ProfileUser:
+ *        type: object
+ *        properties:
+ *         id:
+ *          type: integer
+ *         email:
+ *          type: string
+ *        required:
+ *          - id
+ *          - email
+ *        example:
+ *          id: 1
+ *          email: hello@example.com
+ * 
+ *      ProfileListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/Profile'
+ * 
  * 
  * 
  * 

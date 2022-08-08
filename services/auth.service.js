@@ -30,16 +30,6 @@ export class AuthService {
         return { token, expiresIn };
     };
 
-    static refreshToken (uid) {
-        const { token, expiresIn } = generateToken(uid);
-        
-        return { token, expiresIn };
-    };
-
-    static logout (res) {
-        res.clearCookie("refreshToken");
-    };
-
     static async deleteAccount (id) {
         const user = await User.findOne({ where: { id } });
 
@@ -49,5 +39,15 @@ export class AuthService {
         await User.destroy({ where: { id } });
 
         return true;
+    };
+
+    static refreshToken (uid) {
+        const { token, expiresIn } = generateToken(uid);
+        
+        return { token, expiresIn };
+    };
+
+    static logout (res) {
+        res.clearCookie("refreshToken");
     };
 }
