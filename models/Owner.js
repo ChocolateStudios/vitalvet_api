@@ -6,7 +6,7 @@ import Constants from '../constants/constants.js';
  * @swagger
  * components:
  *  schemas:
- *      Profile:
+ *      Owner:
  *        type: object
  *        properties:
  *         id:
@@ -17,44 +17,38 @@ import Constants from '../constants/constants.js';
  *          type: string
  *         birthday:
  *          type: date
- *         picture:
+ *         direction:
  *          type: string
- *         admin:
- *          type: boolean
- *         college:
+ *         phone:
  *          type: string
- *         review:
+ *         dni:
  *          type: string
- *         user:
- *          type: object
- *          $ref: '#/components/schemas/ProfileUser'
+ *         email:
+ *          type: string
  *        required:
  *          - id
  *          - name
  *          - lastname
  *          - birthday
- *          - admin
- *          - college
- *          - review
- *          - user
+ *          - direction
+ *          - phone
+ *          - dni
+ *          - email
  *        example:
  *          id: 1
- *          name: Manuel
- *          lastname: Quispe
+ *          name: Hugo
+ *          lastname: Parker
  *          birthday: 2020-01-01
- *          picture: http://www.example.com/image.png
- *          admin: false
- *          college: Universidad Nacional de Colombia
- *          review: Lorem ipsum dolor sit amet, consectetur
- *          user:
- *              id: 1
- *              email: hello@example.com
+ *          direction: Av. Example 123 - Bogota
+ *          phone: 999544555
+ *          dni: 760987654
+ *          email: hello@example.com
  */
 
-class Profile extends Model {
+class Owner extends Model {
 }
 
-Profile.init({
+Owner.init({
     name: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
@@ -71,31 +65,32 @@ Profile.init({
         allowNull: false,
         notEmpty: true
     },
-    picture: {
-        type: DataTypes.STRING(Constants.LINK_SIZE),
-        isUrl: true,
-        allowNull: true
-    },
-    admin: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false,
-        notEmpty: true
-    },
-    college: {
+    direction: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
         notEmpty: true
     },
-    review: {
-        type: DataTypes.STRING(Constants.MULTILINE_SIZE),
+    phone: {
+        type: DataTypes.STRING(15),
         allowNull: false,
-        notEmpty: true
+        notEmpty: true,
     },
+    dni: {
+        type: DataTypes.STRING(15),
+        allowNull: false,
+        notEmpty: true,
+        isNumeric: true
+    },
+    email: {
+        type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
+        allowNull: false,
+        notEmpty: true,
+        isEmail: true
+    }
 }, {
     sequelize,
-    modelName: 'Profile',
+    modelName: 'Owner',
     timestamps: false
 });
 
-export default Profile;
+export default Owner;
