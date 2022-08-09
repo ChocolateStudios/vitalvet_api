@@ -1,14 +1,44 @@
-import EventTypes from "../models/EventTypes";
+import { exceptionResponse } from "../exceptions/exceptionResponse.js";
+import EventType from "../models/EventType.js";
+import { EventTypeService } from "../services/eventType.service.js";
 
-export const createEventTypes = async (req, res) => {
-    const { name, type_color } = req.body;
+export const createEventType = async (req, res) => {
     try { 
-        const eventTypes = new EventTypes({ name, type_color});
-        await eventTypes.save();
-
-        return res.status(201).json({name, type_color});
+        const eventType = await EventTypeService.createEventType(req.body);
+        return res.status(201).json(eventType);
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'server error' });
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
     }
 }
+
+export const updateEventType = async (req, res) => {
+    try {
+        const eventType = await EventTypeService.updateEventType(req.body, req.params.eventTypeId);
+        return res.status(200).json(eventType);
+    } catch(error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message});
+    }
+};
+
+export const deleteEventType = async (req, res) => {
+    try {
+        const eventType = await EventTypeService.deleteEventType(req.params.eventTypeId);
+        return res.status(200).json(eventType);
+    } catch(error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
+
+export const getAllEventTypes = async (req, res) => {
+    try {
+        const eventType = await EventTypeService.getAllEventTypes();
+        return res.status(200).json(eventType);
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
+

@@ -149,7 +149,26 @@
  *        items:
  *          type: object
  *          $ref: '#/components/schemas/Owner'
+ *
+ *      EventTypeSubmission:
+ *        type: object
+ *        properties:
+ *         name:
+ *          type: string
+ *         type_color:
+ *          type: string
+ *        required:
+ *          - name
+ *          - type_color
+ *        example:
+ *          name: Corte de cabello
+ *          type_color: "#008000"
  * 
+ *      EventTypeListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/EventType'
  * 
  * 
  * 

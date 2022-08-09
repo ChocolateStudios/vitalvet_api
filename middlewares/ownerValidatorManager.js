@@ -2,17 +2,6 @@ import { validationResult, body, param } from "express-validator";
 import { validationResultExpress } from "./validationCommon.js";
 import Constants from '../constants/constants.js';
 
-export const paramsOwnerValidator = [
-    param('ownerId')
-        .trim()
-        .notEmpty()
-        .withMessage('Owner id is required')
-        .isInt()
-        .withMessage('Owner id must be an integer'),
-    validationResultExpress
-]
-
-
 export const bodyOwnerValidator = [
     body('name')
         .trim()
@@ -63,5 +52,15 @@ export const bodyOwnerValidator = [
         .normalizeEmail()
         .isLength({ max: Constants.ONE_LINE_SIZE })
         .withMessage(`Email must be at most ${Constants.ONE_LINE_SIZE} characters`),
+    validationResultExpress
+]
+
+export const paramsOwnerValidator = [
+    param('ownerId')
+        .trim()
+        .notEmpty()
+        .withMessage('Owner id is required')
+        .isInt()
+        .withMessage('Owner id must be an integer'),
     validationResultExpress
 ]
