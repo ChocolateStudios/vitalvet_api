@@ -60,7 +60,7 @@ router.post('/login', bodyLoginValidator, login);
 
 /**
  * @swagger
- * /api/v1/auth/:
+ * /api/v1/auth:
  *  delete:
  *      summary: Delete logged in user
  *      tags: [User]

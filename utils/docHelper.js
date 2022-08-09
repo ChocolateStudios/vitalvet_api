@@ -80,6 +80,36 @@
  *          type: object
  *          $ref: '#/components/schemas/Profile'
  * 
+ *      SpeciesSubmission:
+ *        type: object
+ *        properties:
+ *          name:
+ *           type: string
+ *        required:
+ *          - name
+ *        example:
+ *          name: Perro
+ * 
+ *      SubspeciesSubmission:
+ *        type: object
+ *        properties:
+ *          name:
+ *           type: string
+ *          species_id:
+ *           type: integer
+ *        required:
+ *          - name
+ *          - species_id
+ *        example:
+ *          name: Bulldog
+ *          species_id: 1
+ * 
+ *      SpeciesListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/Species'
+ * 
  * 
  * 
  * 

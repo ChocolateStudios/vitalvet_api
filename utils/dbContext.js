@@ -1,6 +1,8 @@
+import { Op } from "sequelize";
 import { sequelize } from "../database/connectdb.js";
 import Patient from "../models/Patient.js";
 import Profile from "../models/Profile.js";
+import Species from "../models/Species.js";
 import User from "../models/User.js";
 
 // One-to-one relationship between User and Profile with foreign key 'user_id' in profile
@@ -8,16 +10,33 @@ User.hasOne(Profile, { foreignKey: "user_id", onDelete: "CASCADE", onUpdate: "CA
 Profile.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE", onUpdate: "CASCADE", as: "user" });
 
 
+// One-to-many relationship between Species and Species with foreign key 'species_id' in Species
+Species.hasMany(Species, { 
+    foreignKey: {
+        name: "species_id",
+        allowNull: true
+    }, 
+    onDelete: "CASCADE", onUpdate: "CASCADE", as: "subspecies" 
+});
+Species.belongsTo(Species, 
+    { foreignKey: {
+        name: "species_id",
+        allowNull: true
+    }, 
+    onDelete: "CASCADE", onUpdate: "CASCADE", as: "species" 
+});
+
+
 
 
 // Ensure that the tables are created in the database
-// await Patient.sync({ force: true });
+// await Species.sync({ force: true });
 await sequelize.sync();
 // await sequelize.sync({ force: true });
 
 // Create default instances
 
-(async () => {
+(async () => {      // Create default user and profile admin
     const userAdminExists = await User.findOne({ where: { email: "admin@user.com" } });
 
     if (userAdminExists)
@@ -39,4 +58,20 @@ await sequelize.sync();
         review: "Lorem ipsum dolor sit amet, consectetur",
         user_id: adminUser.id
     });
+})();
+
+(async () => {      // Create default species
+    const dogOrCatSpeciesCreated = await Species.findOne({ 
+        where: { 
+            name: {
+                [Op.or]: ["Perro", "Gato"]
+            }
+        } 
+    });
+
+    if (dogOrCatSpeciesCreated)
+        return;
+
+    await Species.create({ name: "Perro" });
+    await Species.create({ name: "Gato" });
 })();

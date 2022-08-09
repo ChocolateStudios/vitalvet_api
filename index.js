@@ -8,6 +8,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import authRouter from "./routes/auth.route.js";
 import profilesRouter from "./routes/profiles.route.js";
 import patientsRouter from "./routes/patients.route.js";
+import speciesRouter from "./routes/species.route.js";
 
 import "./utils/dbContext.js";
 
@@ -49,6 +50,7 @@ app.use('/api/v1/docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpe
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/profiles', profilesRouter);
 app.use('/api/v1/profiles', patientsRouter);
+app.use('/api/v1/species', speciesRouter);
 
 app.use(express.static('public'));
 
