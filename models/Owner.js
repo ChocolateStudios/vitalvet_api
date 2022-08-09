@@ -42,7 +42,7 @@ import Constants from '../constants/constants.js';
  *          direction: Av. Example 123 - Bogota
  *          phone: 999544555
  *          dni: 760987654
- *          email: hello@example.com
+ *          email: hugo@example.com
  */
 
 class Owner extends Model {
@@ -77,13 +77,13 @@ Owner.init({
     },
     dni: {
         type: DataTypes.STRING(15),
-        allowNull: false,
+        allowNull: true,
         notEmpty: true,
         isNumeric: true
     },
     email: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
-        allowNull: false,
+        allowNull: true,
         notEmpty: true,
         isEmail: true
     }

@@ -110,6 +110,46 @@
  *          type: object
  *          $ref: '#/components/schemas/Species'
  * 
+ *      OwnerSubmission:
+ *        type: object
+ *        properties:
+ *          name:
+ *           type: string
+ *          lastname:
+ *           type: string
+ *          birthday:
+ *           type: date
+ *          direction:
+ *           type: string
+ *          phone:
+ *           type: string
+ *          dni:
+ *           type: string
+ *          email:
+ *           type: string
+ *        required:
+ *          - name
+ *          - lastname
+ *          - birthday
+ *          - direction
+ *          - phone
+ *          - dni
+ *          - email
+ *        example:
+ *          name: Hugo
+ *          lastname: Parker
+ *          birthday: 2020-01-01
+ *          direction: Av. Example 123 - Bogota
+ *          phone: 999544555
+ *          dni: 760987654
+ *          email: hugo@example.com
+ * 
+ *      OwnersListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/Owner'
+ * 
  * 
  * 
  * 
