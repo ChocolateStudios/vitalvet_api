@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import { sequelize } from "../database/connectdb.js";
+import EventType from "../models/EventType.js";
 import Patient from "../models/Patient.js";
 import Profile from "../models/Profile.js";
 import Species from "../models/Species.js";
@@ -30,7 +31,7 @@ Species.belongsTo(Species,
 
 
 // Ensure that the tables are created in the database
-// await Species.sync({ force: true });
+//await Species.sync({ force: true });
 await sequelize.sync();
 // await sequelize.sync({ force: true });
 

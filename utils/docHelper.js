@@ -109,7 +109,26 @@
  *        items:
  *          type: object
  *          $ref: '#/components/schemas/Species'
+ *
+ *      EventTypeSubmission:
+ *        type: object
+ *        properties:
+ *         name:
+ *          type: string
+ *         type_color:
+ *          type: string
+ *        required:
+ *          - name
+ *          - type_color
+ *        example:
+ *          name: Corte Cabello
+ *          type_color: "#008000"
  * 
+ *      EventTypeListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/EventType'
  * 
  * 
  * 
