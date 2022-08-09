@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
-import constants from '../constants/constants.js';
+import Constants from '../constants/constants.js';
 
 /**
  * @swagger
@@ -30,7 +30,7 @@ class EventType extends Model {
 
 EventType.init({
     name: {
-        type: DataTypes.STRING(constants.ONE_LINE_SIZE),
+        type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
         notEmpty: true
     },
