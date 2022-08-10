@@ -3,7 +3,7 @@ import { validationResultExpress } from "./validationCommon.js";
 import { Constants } from '../constants/constants.js';
 
 export const bodyEventTypeValidator = [
-    body('name',)
+    body('name')
         .trim()
         .notEmpty()
         .withMessage('Name is required')

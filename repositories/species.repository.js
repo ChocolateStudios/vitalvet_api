@@ -5,7 +5,7 @@ export class SpeciesRepository {
     static async getSpeciesByName(name) {
         return await Species.findOne({
             where: {
-                [Op.and]: [{ name }, { species_id: null }]
+                [Op.and]: [{ name }, { speciesId: null }]
             }
         });
     }
@@ -13,23 +13,23 @@ export class SpeciesRepository {
     static async getSpeciesById(id) {
         return await Species.findOne({ 
             where: {
-                [Op.and]: [{ id }, { species_id: null }]
+                [Op.and]: [{ id }, { speciesId: null }]
             }
         });
     }
 
-    static async getSubspeciesByNameAndSpeciesId(name, species_id) {
+    static async getSubspeciesByNameAndSpeciesId(name, speciesId) {
         return await Species.findOne({
             where: {
-                [Op.and]: [{ name }, { species_id }]
+                [Op.and]: [{ name }, { speciesId }]
             }
         });
     }
 
-    static async getSubspeciesByIdAndSpeciesId(id, species_id) {
+    static async getSubspeciesByIdAndSpeciesId(id, speciesId) {
         return await Species.findOne({ 
             where: {
-                [Op.and]: [{ id }, { species_id }]
+                [Op.and]: [{ id }, { speciesId }]
             }
          });
     }
@@ -39,7 +39,7 @@ export class SpeciesRepository {
             where: {
                 [Op.and]: [
                     { id }, 
-                    { species_id: { [Op.not]: null } }
+                    { speciesId: { [Op.not]: null } }
                 ]
             }
          });
@@ -47,13 +47,13 @@ export class SpeciesRepository {
 
     static async getAllSpeciesWithSubspecies() {
         return await Species.findAll({
-            where: { species_id: null },
+            where: { speciesId: null },
             include: [{
                 model: Species,
                 as: "subspecies",
                 attributes: ["id", "name"]
             }],
-            attributes: { exclude: ["species_id"] }
+            attributes: { exclude: ["speciesId"] }
         });
     }
 }

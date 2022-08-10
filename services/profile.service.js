@@ -4,13 +4,13 @@ import { User } from "../models/User.js";
 import { ProfileRepository } from "../repositories/profile.repository.js";
 
 export class ProfileService {
-    static async createProfile(body, user_id) {
-        const user = await User.findOne({ where: { id: user_id } });
+    static async createProfile(body, userId) {
+        const user = await User.findOne({ where: { id: userId } });
 
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const profileCreated = await Profile.findOne({ where: { user_id } });
+        const profileCreated = await Profile.findOne({ where: { userId } });
 
         if (profileCreated)
             throw new customException(400, "Profile already exists for this user");
@@ -18,7 +18,7 @@ export class ProfileService {
         const { name, lastname, birthday, picture, college, review } = body;
         const admin = false;
 
-        let profile = Profile.build({ name, lastname, birthday, picture, admin, college, review, user_id });
+        let profile = Profile.build({ name, lastname, birthday, picture, admin, college, review, userId });
         await profile.save();
 
         return {
@@ -37,13 +37,13 @@ export class ProfileService {
         };
     }
 
-    static async updateProfile(body, user_id) {
-        const user = await User.findOne({ where: { id: user_id } });
+    static async updateProfile(body, userId) {
+        const user = await User.findOne({ where: { id: userId } });
 
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const profile = await ProfileRepository.getProfileByUserId(user_id);
+        const profile = await ProfileRepository.getProfileByUserId(userId);
 
         if (!profile)
             throw new customException(404, "Profile not found for this user");
@@ -57,13 +57,13 @@ export class ProfileService {
         return profile;
     }
 
-    static async deleteProfile(user_id) {
-        const user = await User.findOne({ where: { id: user_id } });
+    static async deleteProfile(userId) {
+        const user = await User.findOne({ where: { id: userId } });
 
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const profile = await ProfileRepository.getProfileByUserId(user_id);
+        const profile = await ProfileRepository.getProfileByUserId(userId);
 
         if (!profile)
             throw new customException(404, "Profile not found for this user");
@@ -73,13 +73,13 @@ export class ProfileService {
         return profile;
     }
 
-    static async getProfile(user_id) {
-        const user = await User.findOne({ where: { id: user_id } });
+    static async getProfile(userId) {
+        const user = await User.findOne({ where: { id: userId } });
 
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const profile = await ProfileRepository.getProfileByUserId(user_id);
+        const profile = await ProfileRepository.getProfileByUserId(userId);
 
         if (!profile)
             throw new customException(404, "Profile not found for this user");
@@ -87,13 +87,13 @@ export class ProfileService {
         return profile;
     }
 
-    static async getAllProfilesIfAdmin(user_id) {
-        const user = await User.findOne({ where: { id: user_id } });
+    static async getAllProfilesIfAdmin(userId) {
+        const user = await User.findOne({ where: { id: userId } });
 
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const profile = await Profile.findOne({ where: { user_id } });
+        const profile = await Profile.findOne({ where: { userId } });
 
         if (!profile)
             throw new customException(404, "Profile not found for this user");

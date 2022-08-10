@@ -7,7 +7,8 @@ import { Patient } from "../models/Patient.js";
 import { Profile } from "../models/Profile.js";
 import { Species } from "../models/Species.js";
 import { User } from "../models/User.js";
-
+import { Event } from "../models/Event.js";
+import { Medicine } from "../models/Medicine.js";
 
 
 
@@ -15,29 +16,28 @@ import { User } from "../models/User.js";
 ***************** Relationships *****************
 *************************************************/
 
-// One-to-one relationship between User and Profile with foreign key 'user_id' in profile
-User.hasOne(Profile, { 
-    foreignKey: { name: "user_id", allowNull: false },
-    onDelete: "CASCADE", onUpdate: "CASCADE", as: "profile" 
+// One-to-one relationship between User and Profile with foreign key 'userId' in profile
+User.hasOne(Profile, {
+    foreignKey: { name: "userId", allowNull: false },
+    onDelete: "CASCADE", onUpdate: "CASCADE", as: "profile"
 });
-Profile.belongsTo(User, { 
-    foreignKey: { name: "user_id", allowNull: false },
+Profile.belongsTo(User, {
+    foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "user"
 });
 
 
-// One-to-many relationship between Species and Species with foreign key 'species_id' in Species
+// One-to-many relationship between Species and Species with foreign key 'speciesId' in Species
 Species.hasMany(Species, {
-    foreignKey: { name: "species_id", allowNull: true },
+    foreignKey: { name: "speciesId", allowNull: true },
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "subspecies"
 });
 Species.belongsTo(Species, {
-    foreignKey: { name: "species_id", allowNull: true },
+    foreignKey: { name: "speciesId", allowNull: true },
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "species"
 });
 
-
-// One-to-many relationship between Species and Patient with foreign key 'species_id' in Patient
+// One-to-many relationship between Species and Patient with foreign key 'speciesId' in Patient
 Species.hasMany(Patient, {
     foreignKey: { name: 'subspeciesId', allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patients"
@@ -48,28 +48,57 @@ Patient.belongsTo(Species, {
 });
 
 
-// One-to-many relationship between Owner and Patient with foreign key 'owner_id' in Patient
+// One-to-many relationship between Owner and Patient with foreign key 'ownerId' in Patient
 Owner.hasMany(Patient, {
-    foreignKey: { name: "owner_id", allowNull: false },
+    foreignKey: { name: "ownerId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patients"
 });
 Patient.belongsTo(Owner, {
-    foreignKey: { name: "owner_id", allowNull: false },
+    foreignKey: { name: "ownerId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "owner"
 });
 
 
-// One-to-many relationship between Profile and Patient with foreign key 'profile_id' in Patient
+// One-to-many relationship between Profile and Patient with foreign key 'profileId' in Patient
 Profile.hasMany(Patient, {
-    foreignKey: { name: "profile_id", allowNull: false },
+    foreignKey: { name: "profileId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patients"
 });
 Patient.belongsTo(Profile, {
-    foreignKey: { name: "profile_id", allowNull: false }, 
+    foreignKey: { name: "profileId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "profile"
 });
 
 
+// One-to-many relationship between Patient and Event with foreign key 'patientId' in Event
+Patient.hasMany(Event, {
+    foreignKey: { name: "patientId", allowNull: true },
+    onDelete: "CASCADE", onUpdate: "CASCADE", as: "events"
+});
+Event.belongsTo(Patient, {
+    foreignKey: { name: "patientId", allowNull: true },
+    onDelete: "CASCADE", onUpdate: "CASCADE", as: "patient"
+});
+
+// One-to-many relationship between profile and Event with foreign key 'profileId' in Event
+Profile.hasMany(Event, {
+    foreignKey: { name: "profileId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "events"
+});
+Event.belongsTo(Profile, {
+    foreignKey: { name: "profileId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "profile"
+});
+
+// One-to-many relationship between EventType and Event with foreign key 'eventTypeId' in Event
+EventType.hasMany(Event, {
+    foreignKey: { name: "eventTypeId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "events"
+});
+Event.belongsTo(EventType, {
+    foreignKey: { name: "eventTypeId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "eventType"
+});
 
 
 /************************************************
@@ -99,6 +128,7 @@ await sequelize.sync();
         return;
 
     const adminUser = await User.create({ email: "admin@user.com", password: "adminUserWithPassword#123" });
+
     await Profile.create({
         name: "Fernando",
         lastname: "Salazar",
@@ -107,7 +137,7 @@ await sequelize.sync();
         admin: true,
         college: "Universidad Nacional de Colombia",
         review: "Lorem ipsum dolor sit amet, consectetur",
-        user_id: adminUser.id
+        userId: adminUser.id
     });
 })();
 

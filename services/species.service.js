@@ -17,20 +17,20 @@ export class SpeciesService {
         return species;
     }
 
-    static async createSubspecies(body, species_id) {
+    static async createSubspecies(body, speciesId) {
         const { name } = body;
 
-        const speciesCreated = await SpeciesRepository.getSpeciesById(species_id);
+        const speciesCreated = await SpeciesRepository.getSpeciesById(speciesId);
 
         if (!speciesCreated)
             throw new customException(404, "Species not found");
 
-        const subpeciesCreated = await SpeciesRepository.getSubspeciesByNameAndSpeciesId(name, species_id);
+        const subpeciesCreated = await SpeciesRepository.getSubspeciesByNameAndSpeciesId(name, speciesId);
 
         if (subpeciesCreated)
             throw new customException(400, "Subspecies already exists");
 
-        const species = Species.build({ name, species_id });
+        const species = Species.build({ name, speciesId });
         await species.save();
 
         return species;
@@ -55,25 +55,25 @@ export class SpeciesService {
         return species;
     }
 
-    static async updateSubspecies(body, species_id, id) {
+    static async updateSubspecies(body, speciesId, id) {
         const { name } = body;
 
-        const speciesCreated = await SpeciesRepository.getSpeciesById(species_id);
+        const speciesCreated = await SpeciesRepository.getSpeciesById(speciesId);
 
         if (!speciesCreated)
             throw new customException(404, "Species not found");
 
-        const subpeciesCreated = await SpeciesRepository.getSubspeciesByNameAndSpeciesId(name, species_id);
+        const subpeciesCreated = await SpeciesRepository.getSubspeciesByNameAndSpeciesId(name, speciesId);
 
         if (subpeciesCreated)
             throw new customException(400, "Another subspecies already exists with this name");
 
-        const species = await SpeciesRepository.getSubspeciesByIdAndSpeciesId(id, species_id);
+        const species = await SpeciesRepository.getSubspeciesByIdAndSpeciesId(id, speciesId);
 
         if (!species)
             throw new customException(404, "Subspecies not found");
 
-        species.set({ name, species_id });
+        species.set({ name, speciesId });
         await species.save();
 
         return species;
@@ -90,13 +90,13 @@ export class SpeciesService {
         return species;
     }
 
-    static async deleteSubspecies(species_id, id) {
-        const speciesCreated = await SpeciesRepository.getSpeciesById(species_id);
+    static async deleteSubspecies(speciesId, id) {
+        const speciesCreated = await SpeciesRepository.getSpeciesById(speciesId);
 
         if (!speciesCreated)
             throw new customException(404, "Species not found");
 
-        const species = await SpeciesRepository.getSubspeciesByIdAndSpeciesId(id, species_id);
+        const species = await SpeciesRepository.getSubspeciesByIdAndSpeciesId(id, speciesId);
 
         if (!species)
             throw new customException(404, "Subspecies not found");
@@ -107,19 +107,18 @@ export class SpeciesService {
     }
 
     static async getAllSpecies() {
-        // const species = await Species.findAll({ where: { species_id: null } });
         const species = await SpeciesRepository.getAllSpeciesWithSubspecies();
 
         return species;
     }
 
-    static async getAllSubspeciesBySpeciesId(species_id) {
-        const speciesCreated = await SpeciesRepository.getSpeciesById(species_id);
+    static async getAllSubspeciesBySpeciesId(speciesId) {
+        const speciesCreated = await SpeciesRepository.getSpeciesById(speciesId);
 
         if (!speciesCreated)
             throw new customException(404, "Species not found");
 
-        const species = await Species.findAll({ where: { species_id } });
+        const species = await Species.findAll({ where: { speciesId } });
 
         return species;
     }

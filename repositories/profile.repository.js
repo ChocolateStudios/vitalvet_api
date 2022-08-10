@@ -2,15 +2,15 @@ import { Profile } from "../models/Profile.js";
 import { User } from "../models/User.js";
 
 export class ProfileRepository {
-    static async getProfileByUserId(user_id) {
+    static async getProfileByUserId(userId) {
         return await Profile.findOne({
-            where: { user_id },
+            where: { userId },
             include: [{
                 model: User,
                 as: "user",
                 attributes: ["id", "email"]
             }],
-            attributes: { exclude: ["user_id"] }
+            attributes: { exclude: ["userId"] }
         });
     }
 
@@ -21,7 +21,7 @@ export class ProfileRepository {
                 as: "user",
                 attributes: ["id", "email"]
             }],
-            attributes: { exclude: ["user_id"] }
+            attributes: { exclude: ["userId"] }
         });
     }
 }

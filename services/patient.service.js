@@ -6,10 +6,10 @@ import { Species } from "../models/Species.js";
 import { SpeciesRepository } from "../repositories/species.repository.js";
 
 export class PatientService {
-    static async createPatient(body, user_id) {
+    static async createPatient(body, userId) {
         const { name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId } = body;
 
-        const profile = await Profile.findOne({ where: { user_id } });
+        const profile = await Profile.findOne({ where: { userId } });
 
         if (!profile)
             throw customException(404, "Profile not found for this user");
@@ -24,9 +24,9 @@ export class PatientService {
         if (!owner)
             throw customException(404, "Owner not found");
 
-        const patient = Patient.build({ name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId,
-            profileId: profile.id
-        });
+        const patient = Patient.build({ 
+            name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId, profileId: profile.id });
+            
         await patient.save();
 
         return patient;
@@ -50,15 +50,8 @@ export class PatientService {
         if (!owner)
             throw customException(404, "Owner not found");
 
-        patient.set({
-            name,
-            weight,
-            birthday,
-            day_of_death: dayOfDeath,
-            main_picture: mainPicture,
-            species_id: speciesId,
-            owner_id: ownerId
-        });
+        patient.set({ name, weight, birthday, dayOfDeath, mainPicture, speciesId, ownerId });
+
         await patient.save();
 
         return patient;
