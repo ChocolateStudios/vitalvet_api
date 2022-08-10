@@ -5,7 +5,15 @@ import { MedicinesRepository } from "../repositories/medicines.repository.js";
 
 export class MedicinesService {
     static async getAllMedicines() {
-        const medicines = await Medicines.findAll({ where: { medicines_id: null } });
+        const medicines = await Medicines.findAll();
+
+        return medicines;
+    }
+    
+    static async getMedicinesByName(name) {
+        const medicines = await MedicinesRepository.getMedicinesByName(name);
+        if (!medicines)
+            throw new customException(400, "Medicines not found");
 
         return medicines;
     }

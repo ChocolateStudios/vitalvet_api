@@ -5,7 +5,7 @@ export class MedicinesRepository {
     static async getMedicinesById(id){
         return await Medicines.findOne({
             where:{
-                [Op.and]: [{ id }, { medicines_id: null }]
+                id: [{ id }]
             }
         });
     }
@@ -13,7 +13,7 @@ export class MedicinesRepository {
     static async getMedicinesByName(name){
         return await Medicines.findOne({
             where:{
-                [Op.and]: [{ name }, { medicines_id: null }]
+                name: [{ name }]
             }
         });
     }
