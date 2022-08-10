@@ -1,50 +1,49 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 /**
  * @swagger
  * components:
  *  schemas:
- *      EventType:
+ *      EventTypeResponse:
  *        type: object
  *        properties:
  *         id:
  *          type: integer
  *         name:
  *          type: string
- *         type_color:
+ *         typeColor:
  *          type: string
  *        required:
  *          - id
  *          - name
- *          - type_color
+ *          - typeColor
  *        example:
  *          id: 1
  *          name: Corte de cabello
- *          type_color: "#008000"
+ *          typeColor: "#008000"
  */
 
-class EventType extends Model {
+export class EventType extends Model {
 }
 
 EventType.init({
     name: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
-        notEmpty: true
+        notEmpty: true,
+        unique: true
     },
-    type_color: {
+    typeColor: {
         type: DataTypes.STRING(8),
         allowNull: false,
         notEmpty: true
     }
 }, {
     sequelize,
-    modelName: 'EventType',
-    tableName: 'event_types',
-    timestamps: false
+    modelName: 'eventType',
+    timestamps: false,
+    underscored: true
 });
-
-export default EventType;
 

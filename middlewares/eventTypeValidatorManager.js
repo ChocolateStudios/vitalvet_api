@@ -1,6 +1,6 @@
 import { validationResult, body, param } from "express-validator";
 import { validationResultExpress } from "./validationCommon.js";
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 export const bodyEventTypeValidator = [
     body('name',)
@@ -9,7 +9,7 @@ export const bodyEventTypeValidator = [
         .withMessage('Name is required')
         .isLength({ max: Constants.ONE_LINE_SIZE })
         .withMessage(`Name must be at most ${Constants.ONE_LINE_SIZE} charaters`),
-    body('type_color')
+    body('typeColor')
         .trim()
         .notEmpty()
         .withMessage('Type color is required')

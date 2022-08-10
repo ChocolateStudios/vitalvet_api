@@ -24,7 +24,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/EventType'
+ *                          $ref: '#/components/schemas/EventTypeResponse'
  */
  router.post('/', bodyEventTypeValidator, createEventType);
 
@@ -55,7 +55,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/EventType'
+ *                          $ref: '#/components/schemas/EventTypeResponse'
  */
   router.put('/:eventTypeId', paramEventTypeValidator, bodyEventTypeValidator, updateEventType);
 
@@ -79,7 +79,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/EventType'
+ *                          $ref: '#/components/schemas/EventTypeResponse'
  */
   router.delete('/:eventTypeId', deleteEventType);
 

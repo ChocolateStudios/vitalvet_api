@@ -1,6 +1,5 @@
-import { Op } from "sequelize";
 import { customException } from "../exceptions/exceptionResponse.js";
-import Species from "../models/Species.js";
+import { Species } from "../models/Species.js";
 import { SpeciesRepository } from "../repositories/species.repository.js";
 
 export class SpeciesService {
@@ -40,6 +39,11 @@ export class SpeciesService {
     static async updateSpecies(body, id) {
         const { name } = body;
 
+        const speciesCreated = await SpeciesRepository.getSpeciesByName(name);
+
+        if (speciesCreated)
+            throw new customException(400, "Another species already exists with this name");
+
         const species = await SpeciesRepository.getSpeciesById(id);
 
         if (!species)
@@ -58,6 +62,11 @@ export class SpeciesService {
 
         if (!speciesCreated)
             throw new customException(404, "Species not found");
+
+        const subpeciesCreated = await SpeciesRepository.getSubspeciesByNameAndSpeciesId(name, species_id);
+
+        if (subpeciesCreated)
+            throw new customException(400, "Another subspecies already exists with this name");
 
         const species = await SpeciesRepository.getSubspeciesByIdAndSpeciesId(id, species_id);
 
@@ -98,7 +107,8 @@ export class SpeciesService {
     }
 
     static async getAllSpecies() {
-        const species = await Species.findAll({ where: { species_id: null } });
+        // const species = await Species.findAll({ where: { species_id: null } });
+        const species = await SpeciesRepository.getAllSpeciesWithSubspecies();
 
         return species;
     }

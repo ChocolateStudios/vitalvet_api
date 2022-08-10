@@ -1,5 +1,4 @@
-import { customException, exceptionResponse } from '../exceptions/exceptionResponse.js';
-import Profile from '../models/Profile.js';
+import { exceptionResponse } from '../exceptions/exceptionResponse.js';
 import { ProfileService } from '../services/profile.service.js';
 
 export const createProfile = async (req, res) => {

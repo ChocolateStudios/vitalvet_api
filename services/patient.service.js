@@ -1,28 +1,92 @@
 import { customException } from "../exceptions/exceptionResponse.js";
-import Patient from "../models/Patient.js";
-import Profile from "../models/Profile.js";
+import { Owner } from "../models/Owner.js";
+import { Patient } from "../models/Patient.js";
+import { Profile } from "../models/Profile.js";
+import { Species } from "../models/Species.js";
+import { SpeciesRepository } from "../repositories/species.repository.js";
 
 export class PatientService {
     static async createPatient(body, user_id) {
+        const { name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId } = body;
+
         const profile = await Profile.findOne({ where: { user_id } });
 
         if (!profile)
             throw customException(404, "Profile not found for this user");
 
-        const { name, weight, birthday, dayOfDeath, mainPicture, speciesId, ownerId } = body;
+        const species = await SpeciesRepository.getSubspeciesById(subspeciesId);
 
-        const patient = Patient.build({ 
-            name, 
-            weight, 
-            birthday, 
-            day_of_death: dayOfDeath,
-            main_picture: mainPicture,
-            species_id: speciesId,
-            owner_id: ownerId,
-            profile_id: profile.id
+        if (!species)
+            throw customException(404, "Subspecies not found");
+
+        const owner = await Owner.findOne({ where: { id: ownerId } });
+
+        if (!owner)
+            throw customException(404, "Owner not found");
+
+        const patient = Patient.build({ name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId,
+            profileId: profile.id
         });
         await patient.save();
 
         return patient;
+    }
+    
+    static async updatePatient(body, id) {
+        const patient = await Patient.findOne({ where: { id } });
+
+        if (!patient)
+            throw customException(404, "Patient not found");
+            
+        const { name, weight, birthday, dayOfDeath, mainPicture, speciesId, ownerId } = body;
+
+        const species = await Species.findOne({ where: { id: speciesId } });
+
+        if (!species)
+            throw customException(404, "Species not found");
+
+        const owner = await Owner.findOne({ where: { id: ownerId } });
+
+        if (!owner)
+            throw customException(404, "Owner not found");
+
+        patient.set({
+            name,
+            weight,
+            birthday,
+            day_of_death: dayOfDeath,
+            main_picture: mainPicture,
+            species_id: speciesId,
+            owner_id: ownerId
+        });
+        await patient.save();
+
+        return patient;
+    }
+    
+    static async deletePatient(id) {
+        const patient = await Patient.findOne({ where: { id } });
+
+        if (!patient)
+            throw customException(404, "Patient not found");
+            
+        await patient.destroy();
+
+        return patient;
+    }
+    
+    static async getPatientById(id) {
+        const patient = await Patient.findOne({ where: { id } });
+
+        if (!patient)
+            throw customException(404, "Patient not found");
+
+        return patient;
+    }
+    
+    static async getAllPatients() {
+        const patients = await Patient.findAll();
+
+        return patients;
     }
 }

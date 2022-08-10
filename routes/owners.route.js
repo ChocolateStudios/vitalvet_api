@@ -24,7 +24,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Owner'
+ *                          $ref: '#/components/schemas/OwnerResponse'
  */
 router.post('/', bodyOwnerValidator, createOwner);
 
@@ -55,7 +55,7 @@ router.post('/', bodyOwnerValidator, createOwner);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Owner'
+ *                          $ref: '#/components/schemas/OwnerResponse'
  */
 router.put('/:ownerId', paramsOwnerValidator, bodyOwnerValidator, updateOwner);
 
@@ -79,7 +79,7 @@ router.put('/:ownerId', paramsOwnerValidator, bodyOwnerValidator, updateOwner);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Owner'
+ *                          $ref: '#/components/schemas/OwnerResponse'
  */
 router.delete('/:ownerId', paramsOwnerValidator, deleteOwner);
 
@@ -103,7 +103,7 @@ router.delete('/:ownerId', paramsOwnerValidator, deleteOwner);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Owner'
+ *                          $ref: '#/components/schemas/OwnerResponse'
  */
 router.get('/:ownerId', paramsOwnerValidator, getOwnerById);
 
@@ -120,7 +120,7 @@ router.get('/:ownerId', paramsOwnerValidator, getOwnerById);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/OwnersListResponse'
+ *                          $ref: '#/components/schemas/OwnerListResponse'
  */
 router.get('/', getAllOwners);
 

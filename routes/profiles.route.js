@@ -27,7 +27,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Profile'
+ *                          $ref: '#/components/schemas/ProfileResponse'
  *          401:
  *              $ref: '#/components/responses/UnauthorizedError'
  */
@@ -56,7 +56,7 @@ router.post('/', requireToken, bodyProfileValidator, createProfile);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Profile'
+ *                          $ref: '#/components/schemas/ProfileResponse'
  *          401:
  *              $ref: '#/components/responses/UnauthorizedError'
  */
@@ -78,7 +78,7 @@ router.put('/', requireToken, bodyProfileValidator, updateProfile);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Profile'
+ *                          $ref: '#/components/schemas/ProfileResponse'
  *          401:
  *              $ref: '#/components/responses/UnauthorizedError'
  */
@@ -100,7 +100,7 @@ router.delete('/', requireToken, deleteProfile);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Profile'
+ *                          $ref: '#/components/schemas/ProfileResponse'
  *          401:
  *              $ref: '#/components/responses/UnauthorizedError'
  */

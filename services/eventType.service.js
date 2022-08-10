@@ -1,17 +1,17 @@
 import { customException } from "../exceptions/exceptionResponse.js";
-import EventType from "../models/EventType.js";
+import { EventType } from "../models/EventType.js";
 
 export class EventTypeService {
     static async createEventType(body) {
 
-        const { name, type_color } = body;
+        const { name, typeColor } = body;
 
         const eventTypeCreated = await EventType.findOne({ where: { name } });
         
         if (eventTypeCreated)
             throw new customException(400, "Event type already exists");
 
-        const eventType = EventType.build({ name, type_color });
+        const eventType = EventType.build({ name, typeColor });
         await eventType.save();
 
         return eventType;
@@ -19,14 +19,19 @@ export class EventTypeService {
     }
 
     static async updateEventType(body, id) {
-        const { name, type_color } = body;
+        const { name, typeColor } = body;
+
+        const eventTypeCreated = await EventType.findOne({ where: { name } });
+
+        if (eventTypeCreated)
+            throw new customException(400, "Another event type already exists with this name");
 
         const eventType = await EventType.findOne({ where: { id } });
         
         if (!eventType)
-            throw new customException(404, "Event Type not found");
+            throw new customException(404, "Event type not found");
         
-        eventType.set({ name, type_color });
+        eventType.set({ name, typeColor });
         await eventType.save();
 
         return eventType;

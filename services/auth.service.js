@@ -1,5 +1,5 @@
 import { customException } from "../exceptions/exceptionResponse.js";
-import User from "../models/User.js";
+import { User } from "../models/User.js";
 import { generateRefreshToken, generateToken } from "../utils/tokenManager.js";
 
 export class AuthService {

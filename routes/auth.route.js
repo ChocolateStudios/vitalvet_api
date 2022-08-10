@@ -18,7 +18,7 @@ const router = Router();
  *              application/json:
  *                  schema:
  *                      type: object
- *                      $ref: '#/components/schemas/User'
+ *                      $ref: '#/components/schemas/UserResponse'
  *      responses:
  *          201:
  *              description: User created
@@ -44,7 +44,7 @@ router.post('/register', bodyRegisterValidator, register);
  *              application/json:
  *                  schema:
  *                      type: object
- *                      $ref: '#/components/schemas/User'
+ *                      $ref: '#/components/schemas/UserResponse'
  *      responses:
  *          200:
  *              description: User logged in

@@ -1,6 +1,6 @@
 import { validationResult, body, param } from "express-validator";
 import { validationResultExpress } from "./validationCommon.js";
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 export const bodyPatientValidator = [
     body('name')
@@ -36,7 +36,7 @@ export const bodyPatientValidator = [
         .withMessage('Main picture must be a url')
         .isLength({ max: Constants.LINK_SIZE })
         .withMessage(`Main picture must be at most ${Constants.LINK_SIZE} characters`),
-    body('speciesId')
+    body('subspeciesId')
         .trim()
         .notEmpty()
         .withMessage('Species id is required')
@@ -48,5 +48,15 @@ export const bodyPatientValidator = [
         .withMessage('Owner id is required')
         .isInt()
         .withMessage('Owner id must be an integer'),
+    validationResultExpress
+]
+
+export const paramsPatientValidator = [
+    param('patientId')
+        .trim()
+        .notEmpty()
+        .withMessage('Patient id is required')
+        .isInt()
+        .withMessage('Patient id must be an integer'),
     validationResultExpress
 ]

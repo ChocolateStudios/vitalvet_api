@@ -60,7 +60,7 @@
  *          college: Universidad Nacional de Colombia
  *          review: Lorem ipsum dolor sit amet, consectetur
  * 
- *      ProfileUser:
+ *      ProfileUserResponse:
  *        type: object
  *        properties:
  *         id:
@@ -78,7 +78,7 @@
  *        type: array
  *        items:
  *          type: object
- *          $ref: '#/components/schemas/Profile'
+ *          $ref: '#/components/schemas/ProfileResponse'
  * 
  *      SpeciesSubmission:
  *        type: object
@@ -90,25 +90,31 @@
  *        example:
  *          name: Perro
  * 
- *      SubspeciesSubmission:
+ *      SpeciesWithSubspeciesResponse:
  *        type: object
  *        properties:
+ *          id:
+ *           type: integer
  *          name:
  *           type: string
- *          species_id:
- *           type: integer
+ *          subspecies:
+ *           type: array
  *        required:
+ *          - id
  *          - name
- *          - species_id
+ *          - subspecies
  *        example:
- *          name: Bulldog
- *          species_id: 1
+ *          id: 1
+ *          name: Perro
+ *          subspecies:
+ *              - id: 3
+ *                name: Bulldog
  * 
  *      SpeciesListResponse:
  *        type: array
  *        items:
  *          type: object
- *          $ref: '#/components/schemas/Species'
+ *          $ref: '#/components/schemas/SpeciesWithSubspeciesResponse'
  * 
  *      OwnerSubmission:
  *        type: object
@@ -144,31 +150,31 @@
  *          dni: 760987654
  *          email: hugo@example.com
  * 
- *      OwnersListResponse:
+ *      OwnerListResponse:
  *        type: array
  *        items:
  *          type: object
- *          $ref: '#/components/schemas/Owner'
+ *          $ref: '#/components/schemas/OwnerResponse'
  *
  *      EventTypeSubmission:
  *        type: object
  *        properties:
  *         name:
  *          type: string
- *         type_color:
+ *         typeColor:
  *          type: string
  *        required:
  *          - name
- *          - type_color
+ *          - typeColor
  *        example:
  *          name: Corte de cabello
- *          type_color: "#008000"
+ *          typeColor: "#008000"
  * 
  *      EventTypeListResponse:
  *        type: array
  *        items:
  *          type: object
- *          $ref: '#/components/schemas/EventType'
+ *          $ref: '#/components/schemas/EventTypeResponse'
  * 
  *      PatientSubmission:
  *        type: object
@@ -183,7 +189,7 @@
  *           type: date
  *          mainPicture:
  *           type: string
- *          speciesId:
+ *          subspeciesId:
  *           type: integer
  *          ownerId:
  *           type: integer
@@ -191,7 +197,7 @@
  *          - name
  *          - weight
  *          - birthday
- *          - speciesId
+ *          - subspeciesId
  *          - ownerId
  *        example:
  *          name: Pepe
@@ -199,8 +205,14 @@
  *          birthday: 2019-03-17
  *          dayOfDeath: 2021-06-24
  *          mainPicture: https://www.example.com/image.png
- *          speciesId: 1
+ *          subspeciesId: 1
  *          ownerId: 1
+ * 
+ *      PatientListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/PatientResponse'
  * 
  * 
  * 

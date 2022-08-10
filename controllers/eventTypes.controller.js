@@ -1,5 +1,4 @@
 import { exceptionResponse } from "../exceptions/exceptionResponse.js";
-import EventType from "../models/EventType.js";
 import { EventTypeService } from "../services/eventType.service.js";
 
 export const createEventType = async (req, res) => {

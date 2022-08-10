@@ -1,12 +1,12 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 /**
  * @swagger
  * components:
  *  schemas:
- *      Owner:
+ *      OwnerResponse:
  *        type: object
  *        properties:
  *         id:
@@ -45,7 +45,7 @@ import Constants from '../constants/constants.js';
  *          email: hugo@example.com
  */
 
-class Owner extends Model {
+export class Owner extends Model {
 }
 
 Owner.init({
@@ -89,8 +89,7 @@ Owner.init({
     }
 }, {
     sequelize,
-    modelName: 'Owner',
-    timestamps: false
+    modelName: 'owner',
+    timestamps: false,
+    underscored: true
 });
-
-export default Owner;

@@ -1,5 +1,5 @@
 import { validationResult, body, param } from "express-validator";
-import Constants from "../constants/constants.js";
+import { Constants } from '../constants/constants.js';
 import { validationResultExpress } from "./validationCommon.js";
 
 export const bodyRegisterValidator = [
@@ -9,13 +9,17 @@ export const bodyRegisterValidator = [
         .withMessage('Email is required')
         .isEmail()
         .withMessage('Email must be valid')
-        .normalizeEmail(),
+        .normalizeEmail()
+        .isLength({ max: Constants.ONE_LINE_SIZE })
+        .withMessage(`Email must be at most ${Constants.ONE_LINE_SIZE} characters`),
     body('password')
         .trim()
         .notEmpty()
         .withMessage('Password is required')
         .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters'),
+        .withMessage('Password must be at least 6 characters')
+        .isLength({ max: Constants.ONE_LINE_SIZE })
+        .withMessage(`Password must be at most ${Constants.ONE_LINE_SIZE} characters`),
     validationResultExpress
 ]
 
@@ -34,7 +38,9 @@ export const bodyLoginValidator = [
         .notEmpty()
         .withMessage('Password is required')
         .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters'),
+        .withMessage('Password must be at least 6 characters')
+        .isLength({ max: Constants.ONE_LINE_SIZE })
+        .withMessage(`Password must be at most ${Constants.ONE_LINE_SIZE} characters`),
     validationResultExpress
 ]
 

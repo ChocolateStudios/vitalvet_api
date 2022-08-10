@@ -1,44 +1,44 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 
 /**
  * @swagger
  * components:
  *  schemas:
- *      Species:
+ *      SpeciesResponse:
  *        type: object
  *        properties:
  *         id:
  *          type: integer
  *         name:
  *          type: string
- *         species_id:
+ *         speciesId:
  *          type: integer
  *        required:
  *          - id
  *          - name
- *          - species_id
+ *          - speciesId
  *        example:
  *          id: 1
  *          name: Perro
- *          species_id: null
+ *          speciesId: null
  */
 
-class Species extends Model {
+export class Species extends Model {
 }
 
 Species.init({
     name: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
-        notEmpty: true
+        notEmpty: true,
+        unique: true
     }
 }, {
     sequelize,
-    modelName: 'Species',
-    timestamps: false
+    modelName: 'species',
+    timestamps: false,
+    underscored: true
 });
-
-export default Species;

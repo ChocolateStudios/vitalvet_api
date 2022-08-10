@@ -1,6 +1,6 @@
 import { validationResult, body, param } from "express-validator";
 import { validationResultExpress } from "./validationCommon.js";
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 export const bodyProfileValidator = [
     body('name')

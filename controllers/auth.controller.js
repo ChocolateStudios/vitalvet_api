@@ -1,6 +1,4 @@
-import User from "../models/User.js";
-import { customException, exceptionResponse } from "../exceptions/exceptionResponse.js";
-import { generateRefreshToken, generateToken } from "../utils/tokenManager.js";
+import { exceptionResponse } from "../exceptions/exceptionResponse.js";
 import { AuthService } from "../services/auth.service.js";
 
 export const register = async (req, res) => {
@@ -27,11 +25,7 @@ export const login = async (req, res) => {
 
 export const deleteAccount = async (req, res) => {
     try {
-        const successful = AuthService.deleteAccount(req.uid);
-        
-        if (!successful)
-            throw new customException();
-
+        AuthService.deleteAccount(req.uid);
         return res.status(200).json({ message: "Account deleted" });
     } catch (error) {
         const { code, message } = exceptionResponse(error);

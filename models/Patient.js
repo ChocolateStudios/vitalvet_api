@@ -1,12 +1,12 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 /**
  * @swagger
  * components:
  *  schemas:
- *      Patient:
+ *      PatientResponse:
  *        type: object
  *        properties:
  *         id:
@@ -21,14 +21,14 @@ import Constants from '../constants/constants.js';
  *          type: date
  *         mainPicture:
  *          type: string
- *         createdAt:
- *          type: datetime
- *         speciesId:
+ *         subspeciesId:
  *          type: integer
  *         ownerId:
  *          type: integer
  *         profileId:
  *          type: integer
+ *         createdAt:
+ *          type: datetime
  *        required:
  *          - id
  *          - name
@@ -36,10 +36,10 @@ import Constants from '../constants/constants.js';
  *          - birthday
  *          - dayOfDeath
  *          - mainPicture
- *          - createdAt
- *          - speciesId
+ *          - subspeciesId
  *          - ownerId
  *          - profileId
+ *          - createdAt
  *        example:
  *          id: 1
  *          name: Pepe
@@ -47,13 +47,13 @@ import Constants from '../constants/constants.js';
  *          birthday: 2019-03-17
  *          dayOfDeath: 2021-06-24
  *          mainPicture: https://www.example.com/image.png
- *          createdAt: 2019-03-17T00:00:00.000Z
- *          speciesId: 1
+ *          subspeciesId: 1
  *          ownerId: 1
  *          profileId: 1
+ *          createdAt: 2019-03-17T00:00:00.000Z
  */
 
-class Patient extends Model {
+export class Patient extends Model {
 }
 
 Patient.init({
@@ -72,13 +72,13 @@ Patient.init({
         allowNull: false,
         notEmpty: true
     },
-    day_of_death: {
+    dayOfDeath: {
         type: DataTypes.DATEONLY,
         isDate: true,
         allowNull: true,
         notEmpty: true
     },
-    main_picture: {
+    mainPicture: {
         type: DataTypes.STRING(Constants.LINK_SIZE),
         isUrl: true,
         allowNull: true,
@@ -87,10 +87,8 @@ Patient.init({
 
 }, {
     sequelize,
-    modelName: 'Patient',
+    modelName: 'patient',
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: false
+    updatedAt: false,
+    underscored: true
 });
-
-export default Patient;

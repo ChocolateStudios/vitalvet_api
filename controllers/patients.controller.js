@@ -11,22 +11,42 @@ export const createPatient = async (req, res) => {
     }
 };
 
-// export const updatePatient = async (req, res) => {
-//     try {
-//         const patient = await PatientService.updatePatient(req.body, req.uid);
-//         return res.status(200).json(patient);
-//     } catch (error) {
-//         const { code, message } = exceptionResponse(error);
-//         return res.status(code).json({ message });
-//     }
-// };
+export const updatePatient = async (req, res) => {
+    try {
+        const patient = await PatientService.updatePatient(req.body, req.params.patientId);
+        return res.status(200).json(patient);
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
 
-// export const deletePatient = async (req, res) => {
-//     try {
-//         const patient = await PatientService.deletePatient(req.body, req.uid);
-//         return res.status(200).json(patient);
-//     } catch (error) {
-//         const { code, message } = exceptionResponse(error);
-//         return res.status(code).json({ message });
-//     }
-// };
+export const deletePatient = async (req, res) => {
+    try {
+        const patient = await PatientService.deletePatient(req.params.patientId);
+        return res.status(200).json(patient);
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
+
+export const getPatientById = async (req, res) => {
+    try {
+        const patient = await PatientService.getPatientById(req.params.patientId);
+        return res.status(200).json(patient);
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
+
+export const getAllPatients = async (req, res) => {
+    try {
+        const patient = await PatientService.getAllPatients();
+        return res.status(200).json(patient);
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};

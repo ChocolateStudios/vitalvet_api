@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createSpecies, createSubspecies, deleteSpecies, deleteSubspecies, getAllSpecies, getAllSubspeciesBySpeciesId, updateSpecies, updateSubspecies } from '../controllers/species.controller.js';
-import { bodySpeciesOrSubspeciesValidator, bodySpeciesValidator, bodySubspeciesValidator } from '../middlewares/speciesValidatorManager.js';
+import { bodySpeciesValidator, paramsSpeciesAndSubspeciesValidator, paramsSpeciesValidator } from '../middlewares/speciesValidatorManager.js';
 
 const router = Router();
 
@@ -25,7 +25,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Species'
+ *                          $ref: '#/components/schemas/SpeciesResponse'
  */
 router.post('/', bodySpeciesValidator, createSpecies);
 
@@ -57,9 +57,9 @@ router.post('/', bodySpeciesValidator, createSpecies);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Species'
+ *                          $ref: '#/components/schemas/SpeciesResponse'
  */
-router.post('/:speciesId/subspecies', bodySpeciesValidator, createSubspecies);
+router.post('/:speciesId/subspecies', paramsSpeciesValidator, bodySpeciesValidator, createSubspecies);
 
 
 /**
@@ -89,9 +89,9 @@ router.post('/:speciesId/subspecies', bodySpeciesValidator, createSubspecies);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Species'
+ *                          $ref: '#/components/schemas/SpeciesResponse'
  */
-router.put('/:speciesId', bodySpeciesValidator, updateSpecies);
+router.put('/:speciesId', paramsSpeciesValidator, bodySpeciesValidator, updateSpecies);
 
 
 /**
@@ -127,9 +127,9 @@ router.put('/:speciesId', bodySpeciesValidator, updateSpecies);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Species'
+ *                          $ref: '#/components/schemas/SpeciesResponse'
  */
-router.put('/:speciesId/subspecies/:subspeciesId', bodySpeciesValidator, updateSubspecies);
+router.put('/:speciesId/subspecies/:subspeciesId', paramsSpeciesAndSubspeciesValidator, bodySpeciesValidator, updateSubspecies);
 
 
 /**
@@ -152,9 +152,9 @@ router.put('/:speciesId/subspecies/:subspeciesId', bodySpeciesValidator, updateS
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Species'
+ *                          $ref: '#/components/schemas/SpeciesResponse'
  */
-router.delete('/:speciesId', deleteSpecies);
+router.delete('/:speciesId', paramsSpeciesValidator, deleteSpecies);
 
 
 /**
@@ -183,16 +183,16 @@ router.delete('/:speciesId', deleteSpecies);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/Species'
+ *                          $ref: '#/components/schemas/SpeciesResponse'
  */
-router.delete('/:speciesId/subspecies/:subspeciesId', deleteSubspecies);
+router.delete('/:speciesId/subspecies/:subspeciesId', paramsSpeciesAndSubspeciesValidator, deleteSubspecies);
 
 
 /**
  * @swagger
  * /api/v1/species:
  *  get:
- *      summary: Get all species
+ *      summary: Get all species with subspecies
  *      tags: [Species]
  *      responses:
  *          200:
@@ -207,7 +207,7 @@ router.get('/', getAllSpecies);
 
 
 /**
- * @swagger
+ * swagger
  * /api/v1/species/{speciesId}/subspecies:
  *  get:
  *      summary: Get all subspecies by species id
@@ -228,6 +228,6 @@ router.get('/', getAllSpecies);
  *                          type: object
  *                          $ref: '#/components/schemas/SpeciesListResponse'
  */
-router.get('/:speciesId/subspecies', getAllSubspeciesBySpeciesId);
+// router.get('/:speciesId/subspecies', paramsSpeciesValidator, getAllSubspeciesBySpeciesId);
 
 export default router;

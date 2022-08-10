@@ -1,5 +1,5 @@
 import { customException } from "../exceptions/exceptionResponse.js";
-import Owner from "../models/Owner.js";
+import { Owner } from "../models/Owner.js";
 
 export class OwnerService {
     static async createOwner(body) {

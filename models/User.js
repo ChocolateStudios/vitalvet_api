@@ -1,13 +1,13 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
+import { Constants } from '../constants/constants.js';
 import bcryptjs from 'bcryptjs';
-import Constants from '../constants/constants.js';
 
 /**
  * @swagger
  * components:
  *  schemas:
- *      User:
+ *      UserResponse:
  *        type: object
  *        properties:
  *         email:
@@ -22,7 +22,7 @@ import Constants from '../constants/constants.js';
  *          password: f5Haa8#asD
  */
 
-class User extends Model {
+export class User extends Model {
     async comparePassword(candidatePassword) {
         return await bcryptjs.compare(candidatePassword, this.password);
     }
@@ -43,8 +43,9 @@ User.init({
     }
 }, {
     sequelize,
-    modelName: 'User',
-    timestamps: false
+    modelName: 'user',
+    timestamps: false,
+    underscored: true
 });
 
 User.beforeSave(async (user, options) => {
@@ -59,5 +60,3 @@ User.beforeSave(async (user, options) => {
         throw new Error('Failed to generate password hash');
     }
 });
-
-export default User;

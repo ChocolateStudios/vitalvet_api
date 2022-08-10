@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import Species from "../models/Species.js";
+import { Species } from "../models/Species.js";
 
 export class SpeciesRepository {
     static async getSpeciesByName(name) {
@@ -32,5 +32,28 @@ export class SpeciesRepository {
                 [Op.and]: [{ id }, { species_id }]
             }
          });
+    }
+
+    static async getSubspeciesById(id) {
+        return await Species.findOne({ 
+            where: {
+                [Op.and]: [
+                    { id }, 
+                    { species_id: { [Op.not]: null } }
+                ]
+            }
+         });
+    }
+
+    static async getAllSpeciesWithSubspecies() {
+        return await Species.findAll({
+            where: { species_id: null },
+            include: [{
+                model: Species,
+                as: "subspecies",
+                attributes: ["id", "name"]
+            }],
+            attributes: { exclude: ["species_id"] }
+        });
     }
 }

@@ -1,12 +1,12 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database/connectdb.js';
-import Constants from '../constants/constants.js';
+import { Constants } from '../constants/constants.js';
 
 /**
  * @swagger
  * components:
  *  schemas:
- *      Profile:
+ *      ProfileResponse:
  *        type: object
  *        properties:
  *         id:
@@ -27,7 +27,7 @@ import Constants from '../constants/constants.js';
  *          type: string
  *         user:
  *          type: object
- *          $ref: '#/components/schemas/ProfileUser'
+ *          $ref: '#/components/schemas/ProfileUserResponse'
  *        required:
  *          - id
  *          - name
@@ -52,7 +52,7 @@ import Constants from '../constants/constants.js';
  *              email: hello@example.com
  */
 
-class Profile extends Model {
+export class Profile extends Model {
 }
 
 Profile.init({
@@ -96,8 +96,7 @@ Profile.init({
     },
 }, {
     sequelize,
-    modelName: 'Profile',
-    timestamps: false
+    modelName: 'profile',
+    timestamps: false,
+    underscored: true
 });
-
-export default Profile;

@@ -1,6 +1,6 @@
 import { customException } from "../exceptions/exceptionResponse.js";
-import Profile from "../models/Profile.js";
-import User from "../models/User.js";
+import { Profile } from "../models/Profile.js";
+import { User } from "../models/User.js";
 import { ProfileRepository } from "../repositories/profile.repository.js";
 
 export class ProfileService {
@@ -18,7 +18,7 @@ export class ProfileService {
         const { name, lastname, birthday, picture, college, review } = body;
         const admin = false;
 
-        const profile = Profile.build({ name, lastname, birthday, picture, admin, college, review, user_id });
+        let profile = Profile.build({ name, lastname, birthday, picture, admin, college, review, user_id });
         await profile.save();
 
         return {
