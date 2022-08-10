@@ -33,6 +33,7 @@ import Constants from '../constants/constants.js';
  *          - name
  *          - lastname
  *          - birthday
+ *          - picture
  *          - admin
  *          - college
  *          - review
@@ -74,7 +75,8 @@ Profile.init({
     picture: {
         type: DataTypes.STRING(Constants.LINK_SIZE),
         isUrl: true,
-        allowNull: true
+        allowNull: true,
+        notEmpty: true
     },
     admin: {
         type: DataTypes.BOOLEAN,

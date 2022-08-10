@@ -21,14 +21,14 @@ export const bodyPatientValidator = [
         .withMessage('Birthday is required')
         .isDate()
         .withMessage('Birthday must be a date'),
-    body('day_of_death')
+    body('dayOfDeath')
         .trim()
         .notEmpty()
         .withMessage('Day of death is required')
         .isDate()
         .withMessage('Day of death must be a date'),
-    body('main_picture')
-        .if(body('main_picture').exists())
+    body('mainPicture')
+        .if(body('mainPicture').exists())
         .trim()
         .notEmpty()
         .withMessage('Main picture is required')
@@ -36,5 +36,17 @@ export const bodyPatientValidator = [
         .withMessage('Main picture must be a url')
         .isLength({ max: Constants.LINK_SIZE })
         .withMessage(`Main picture must be at most ${Constants.LINK_SIZE} characters`),
+    body('speciesId')
+        .trim()
+        .notEmpty()
+        .withMessage('Species id is required')
+        .isInt()
+        .withMessage('Species id must be an integer'),
+    body('ownerId')
+        .trim()
+        .notEmpty()
+        .withMessage('Owner id is required')
+        .isInt()
+        .withMessage('Owner id must be an integer'),
     validationResultExpress
 ]

@@ -185,7 +185,7 @@ router.delete('/:speciesId', deleteSpecies);
  *                          type: object
  *                          $ref: '#/components/schemas/Species'
  */
-router.delete('/:speciesId', deleteSubspecies);
+router.delete('/:speciesId/subspecies/:subspeciesId', deleteSubspecies);
 
 
 /**

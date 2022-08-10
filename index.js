@@ -51,7 +51,7 @@ app.use('/api/v1/docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpe
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/profiles', profilesRouter);
-app.use('/api/v1/profiles', patientsRouter);
+app.use('/api/v1/patients', patientsRouter);
 app.use('/api/v1/species', speciesRouter);
 app.use('/api/v1/owners', ownersRouter);
 app.use('/api/v1/eventTypes', eventTypeRouter);

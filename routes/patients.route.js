@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createPatient } from '../controllers/patients.controller.js';
+import { requireToken } from '../middlewares/requireToken.js';
 
 const router = Router();
 
@@ -10,13 +11,15 @@ const router = Router();
  *  post:
  *      summary: Register a new patient
  *      tags: [Patients]
+ *      security:
+ *          - BearerAuth: []
  *      requestBody:
  *          required: true
  *          content:
  *              application/json:
  *                  schema:
  *                      type: object
- *                      $ref: '#/components/schemas/Patient'
+ *                      $ref: '#/components/schemas/PatientSubmission'
  *      responses:
  *          201:
  *              description: Patient created
@@ -26,6 +29,6 @@ const router = Router();
  *                          type: object
  *                          $ref: '#/components/schemas/Patient'
  */
-router.post('/', createPatient);
+router.post('/', requireToken, createPatient);
 
 export default router;

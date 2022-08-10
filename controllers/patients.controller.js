@@ -1,3 +1,4 @@
+import { exceptionResponse } from '../exceptions/exceptionResponse.js';
 import { PatientService } from '../services/patient.service.js';
 
 export const createPatient = async (req, res) => {

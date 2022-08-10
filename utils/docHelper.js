@@ -170,6 +170,38 @@
  *          type: object
  *          $ref: '#/components/schemas/EventType'
  * 
+ *      PatientSubmission:
+ *        type: object
+ *        properties:
+ *          name:
+ *           type: string
+ *          weight:
+ *           type: number
+ *          birthday:
+ *           type: date
+ *          dayOfDeath:
+ *           type: date
+ *          mainPicture:
+ *           type: string
+ *          speciesId:
+ *           type: integer
+ *          ownerId:
+ *           type: integer
+ *        required:
+ *          - name
+ *          - weight
+ *          - birthday
+ *          - speciesId
+ *          - ownerId
+ *        example:
+ *          name: Pepe
+ *          weight: 40
+ *          birthday: 2019-03-17
+ *          dayOfDeath: 2021-06-24
+ *          mainPicture: https://www.example.com/image.png
+ *          speciesId: 1
+ *          ownerId: 1
+ * 
  * 
  * 
  *  securitySchemes:

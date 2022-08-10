@@ -9,9 +9,18 @@ export class PatientService {
         if (!profile)
             throw customException(404, "Profile not found for this user");
 
-        const { name, weight, birthday, day_of_death, main_picture, species_id, owner_id } = body;
+        const { name, weight, birthday, dayOfDeath, mainPicture, speciesId, ownerId } = body;
 
-        const patient = Patient.build({ name, weight, birthday, day_of_death, main_picture, species_id, owner_id, profile_id: profile.id });
+        const patient = Patient.build({ 
+            name, 
+            weight, 
+            birthday, 
+            day_of_death: dayOfDeath,
+            main_picture: mainPicture,
+            species_id: speciesId,
+            owner_id: ownerId,
+            profile_id: profile.id
+        });
         await patient.save();
 
         return patient;
