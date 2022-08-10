@@ -7,6 +7,8 @@ import Patient from "../models/Patient.js";
 import Profile from "../models/Profile.js";
 import Species from "../models/Species.js";
 import User from "../models/User.js";
+import Event from "../models/Event.js";
+
 
 
 /************************************************
@@ -27,7 +29,6 @@ Species.belongsTo(Species, {
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "species"
 });
 
-
 // One-to-many relationship between Species and Patient with foreign key 'species_id' in Patient
 Species.hasMany(Patient, { foreignKey: "species_id", onUpdate: "CASCADE", as: "patients" });
 Patient.belongsTo(Species, { foreignKey: "species_id", onUpdate: "CASCADE", as: "subspecies" });
@@ -40,6 +41,31 @@ Patient.belongsTo(Owner, { foreignKey: "owner_id", onUpdate: "CASCADE", as: "own
 Profile.hasMany(Patient, { foreignKey: "profile_id", onDelete: 'NO ACTION', onUpdate: "CASCADE", as: "patients" });
 Patient.belongsTo(Profile, { foreignKey: "profile_id", onDelete: 'NO ACTION', onUpdate: "CASCADE", as: "profile" });
 
+// One-to-many relationship between Patient and Event with foreign key 'patient_id' in Event
+Patient.hasMany(Event, { foreignKey: "patient_id", onDelete: "CASCADE", onUpdate: "CASCADE", as: "events" });
+Event.belongsTo(Patient, {
+    foreignKey: "patient_id", onDelete: "CASCADE", onUpdate: "CASCADE", as: "patient"
+});
+
+// One-to-many relationship between profile and Event with foreign key 'profile_id' in Event
+Profile.hasMany(Event, {
+    foreignKey: { name: "profile_id", allowNull: false },
+    onDelete: 'NO ACTION', onUpdate: "CASCADE", as: "events"
+});
+Event.belongsTo(Profile, {
+    foreignKey: { name: "profile_id", allowNull: false },
+    onDelete: 'NO ACTION', onUpdate: "CASCADE", as: "profile"
+});
+
+// One-to-many relationship between EventType and Event with foreign key 'event_type_id' in Event
+EventType.hasMany(Event, {
+    foreignKey: { name: "event_type_id", allowNull: false },
+    onDelete: 'NO ACTION', onUpdate: "CASCADE", as: "events"
+});
+Event.belongsTo(EventType, {
+    foreignKey: { name: "event_type_id", allowNull: false },
+    onDelete: 'NO ACTION', onUpdate: "CASCADE", as: "event_type"
+});
 
 
 /************************************************
@@ -47,7 +73,7 @@ Patient.belongsTo(Profile, { foreignKey: "profile_id", onDelete: 'NO ACTION', on
 *************************************************/
 
 // Ensure that the tables are created in the database
-// await sequelize.sync({ force: true });
+//await sequelize.sync({ force: true });
 await sequelize.sync();
 
 

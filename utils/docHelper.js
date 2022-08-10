@@ -202,6 +202,40 @@
  *          speciesId: 1
  *          ownerId: 1
  * 
+ *      EventSubmission:
+ *        type: object
+ *        properties:
+ *         title:
+ *          type: string
+ *         description:
+ *          type: string
+ *         startTime:
+ *          type: datetime
+ *         endTime:
+ *          type: datetime
+ *         patientId:
+ *          type: integer
+ *         eventTypeId:
+ *          type: integer
+ *        required:
+ *          - title
+ *          - description
+ *          - startTime
+ *          - patientId
+ *          - eventTypeId
+ *        example:
+ *          title: Bañar a Pepe
+ *          description: Shampoo de Limon
+ *          startTime: 2019-03-17T00:00:00.000Z
+ *          endTime: 2019-03-17T01:00:00.000Z
+ *          patientId: 1
+ *          eventTypeId: 1
+ * 
+ *      EventListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/Event'
  * 
  * 
  *  securitySchemes:

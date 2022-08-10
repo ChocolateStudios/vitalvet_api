@@ -11,6 +11,7 @@ import patientsRouter from "./routes/patients.route.js";
 import speciesRouter from "./routes/species.route.js";
 import ownersRouter from "./routes/owners.route.js";
 import eventTypeRouter from "./routes/eventTypes.route.js";
+import eventRouter from "./routes/events.route.js";
 
 import "./utils/dbContext.js";
 
@@ -55,6 +56,7 @@ app.use('/api/v1/patients', patientsRouter);
 app.use('/api/v1/species', speciesRouter);
 app.use('/api/v1/owners', ownersRouter);
 app.use('/api/v1/eventTypes', eventTypeRouter);
+app.use('/api/v1/events', eventRouter);
 
 app.use(express.static('public'));
 
