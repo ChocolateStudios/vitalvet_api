@@ -237,6 +237,21 @@
  *          type: object
  *          $ref: '#/components/schemas/Event'
  * 
+ *      MedicinesListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/Medicines' 
+ * 
+ *      MedicineSubmission:
+ *        type: object
+ *        properties:
+ *          name:
+ *           type: string
+ *        required:
+ *          - name
+ *        example:
+ *          name: Apronax
  * 
  *  securitySchemes:
  *      BearerAuth:

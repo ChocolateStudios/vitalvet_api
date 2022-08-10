@@ -4,7 +4,6 @@ import express from "express";
 import cors from "cors";
 import swaggerUI from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
-
 import authRouter from "./routes/auth.route.js";
 import profilesRouter from "./routes/profiles.route.js";
 import patientsRouter from "./routes/patients.route.js";
@@ -12,7 +11,7 @@ import speciesRouter from "./routes/species.route.js";
 import ownersRouter from "./routes/owners.route.js";
 import eventTypeRouter from "./routes/eventTypes.route.js";
 import eventRouter from "./routes/events.route.js";
-
+import medicinesRouter from "./routes/medicines.route.js";
 import "./utils/dbContext.js";
 
 const app = express();
@@ -57,6 +56,8 @@ app.use('/api/v1/species', speciesRouter);
 app.use('/api/v1/owners', ownersRouter);
 app.use('/api/v1/eventTypes', eventTypeRouter);
 app.use('/api/v1/events', eventRouter);
+app.use('/api/v1/medicines', medicinesRouter);
+
 
 app.use(express.static('public'));
 
