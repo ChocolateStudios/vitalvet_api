@@ -41,7 +41,7 @@ export class AuthService {
         if (!user)
             throw new customException(404, "Invalid user");
 
-        await User.destroy({ where: { id } });
+        await user.destroy();
 
         return true;
     };
