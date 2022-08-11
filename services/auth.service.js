@@ -4,6 +4,11 @@ import { generateRefreshToken, generateToken } from "../utils/tokenManager.js";
 
 export class AuthService {
     static async register(email, password, res) {
+        const userCreated = await User.findOne({ where: { email } });
+
+        if (userCreated)
+            throw new customException(400, "User already exists with this email");
+
         const user = User.build({ email, password });
         await user.save();
 

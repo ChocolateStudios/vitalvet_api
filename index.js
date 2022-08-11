@@ -14,7 +14,7 @@ import eventRouter from "./routes/events.route.js";
 import medicinesRouter from "./routes/medicines.route.js";
 import "./utils/dbContext.js";
 
-const app = express();
+export const app = express();
 
 const whiteList = [process.env.ORIGIN1, process.env.ORIGIN2, process.env.ORIGIN3];
 
@@ -61,5 +61,9 @@ app.use('/api/v1/medicines', medicinesRouter);
 
 app.use(express.static('public'));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("Server started on port " + PORT + " 🔥🔥 http://localhost:" + PORT));
+let PORT = process.env.PORT || 5000;
+
+if (process.env.MODE === "test")
+    PORT = 5015;
+
+export const server = app.listen(PORT, () => console.log("Server started on port " + PORT + " 🔥🔥 http://localhost:" + PORT));

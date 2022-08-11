@@ -116,43 +116,49 @@ await sequelize.sync();
 *************** Default Instances ***************
 *************************************************/
 
-(async () => {      // Create default user and profile admin
-    const userAdminExists = await User.findOne({ where: { email: "admin@user.com" } });
-
-    if (userAdminExists)
+(async () => {
+    if (process.env.MODE === "test")
         return;
 
-    const profileAdminExists = await Profile.findOne({ where: { admin: true } });
+    (async () => {      // Create default user and profile admin
+        const userAdminExists = await User.findOne({ where: { email: "admin@user.com" } });
 
-    if (profileAdminExists)
-        return;
+        if (userAdminExists)
+            return;
 
-    const adminUser = await User.create({ email: "admin@user.com", password: "adminUserWithPassword#123" });
+        const profileAdminExists = await Profile.findOne({ where: { admin: true } });
 
-    await Profile.create({
-        name: "Fernando",
-        lastname: "Salazar",
-        birthday: "2020-01-01",
-        picture: "http://www.example.com/image.png",
-        admin: true,
-        college: "Universidad Nacional de Colombia",
-        review: "Lorem ipsum dolor sit amet, consectetur",
-        userId: adminUser.id
-    });
-})();
+        if (profileAdminExists)
+            return;
 
-(async () => {      // Create default species
-    const dogOrCatSpeciesCreated = await Species.findOne({
-        where: {
-            name: {
-                [Op.or]: ["Perro", "Gato"]
+        const adminUser = await User.create({ email: "admin@user.com", password: "adminUserWithPassword#123" });
+
+        await Profile.create({
+            name: "Fernando",
+            lastname: "Salazar",
+            birthday: "2020-01-01",
+            picture: "http://www.example.com/image.png",
+            admin: true,
+            college: "Universidad Nacional de Colombia",
+            review: "Lorem ipsum dolor sit amet, consectetur",
+            userId: adminUser.id
+        });
+    })();
+
+    (async () => {      // Create default species
+        const dogOrCatSpeciesCreated = await Species.findOne({
+            where: {
+                name: {
+                    [Op.or]: ["Perro", "Gato"]
+                }
             }
-        }
-    });
+        });
 
-    if (dogOrCatSpeciesCreated)
-        return;
+        if (dogOrCatSpeciesCreated)
+            return;
 
-    await Species.create({ name: "Perro" });
-    await Species.create({ name: "Gato" });
+        await Species.create({ name: "Perro" });
+        await Species.create({ name: "Gato" });
+    })();
+
 })();
