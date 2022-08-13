@@ -61,7 +61,7 @@ MedicalAttention.init({
         type: DataTypes.DATEONLY,
         allowNull: false
     },
-    result_notes: {
+    resultNotes: {
         type: DataTypes.STRING(Constants.MULTILINE_SIZE),
         allowNull: false
     }
