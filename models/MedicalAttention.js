@@ -6,7 +6,7 @@ import { Constants } from '../constants/constants.js';
  * @swagger
  * components:
  *  schemas:
- *      MedicalAttention:
+ *      MedicalAttentionResponse:
  *        type: object
  *        properties:
  *         id:
@@ -67,7 +67,7 @@ MedicalAttention.init({
     }
 }, {
     sequelize,
-    modelName: 'medical_attention',
+    modelName: 'medicalAttention',
     timestamps: false,
     underscored: true
 });
