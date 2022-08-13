@@ -1,22 +1,17 @@
 import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { User } from "../models/User.js";
-import { api, expectSuccessfulCreation, expectBadRequestResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectIncompleteRequiredBody, expectUnauthorizedResponse, expectTokenErrorMessageReceived } from "./testCommon.js";
-
-const initialUsers = [
-    { email: "firstemail@example.com", password: "firstPassword#123" },
-    { email: "secondemail@example.com", password: "secondPassword#321" }
-]
-
-beforeEach(async () => {
-    await User.destroy({ where: {} });
-
-    for (let user of initialUsers) {
-        await User.create(user);
-    }
-});
+import { api, expectSuccessfulCreation, expectBadRequestResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectIncompleteRequiredBody, expectUnauthorizedResponse, expectTokenErrorMessageReceived, initialUsers, apiPost, expectLengthOfDatabaseRecordsToBeTheSameWith, expectBadRequiredBodyAttribute, apiLoginUser, apiDeleteWithAuth, apiDelete, apiLoginTestUser, after1s, expectTokenExpiredErrorMessageReceived } from "./testCommon.js";
 
 describe('user enpoints', () => {
+    beforeEach(async () => {
+        await User.destroy({ where: {} });
+
+        for (let user of initialUsers) {
+            await User.create(user);
+        }
+    });
+
     describe('test scenary ready', () => {
         test('expected number of initial users', async () => {
             const users = await User.findAll();
@@ -33,218 +28,129 @@ describe('user enpoints', () => {
     });
 
     describe('register a new user', () => {
+        const endpointUrl = '/auth/register';
+
         test('user created successfully', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-
-            const response = await api.post('/api/v1/auth/register').send(newUser);
-
-            expectSuccessfulCreation(response);
-
-            expect(response.body.expiresIn).toBeTruthy();
-            expect(response.body.expiresIn).toBe(900);
-            expect(response.body.token).toBeTruthy();
-            expect(response.body.token.length).toBeGreaterThan(0);
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length + 1);
+            const createResponse = await apiPost(endpointUrl, newUser);
+            expectSuccessfulCreation(createResponse);
+            expect(createResponse.body.expiresIn).toBe(900);
+            expect(createResponse.body.token.length).toBeGreaterThan(0);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length + 1);
         });
 
         test('failed to create user because there is already another user with the same email', async () => {
-            const newUser = { email: initialUsers[1].email, password: "newPassword#123" };
-
-            const response = await api.post('/api/v1/auth/register').send(newUser);
-
-            expectBadRequestResponse(response);
-
-            expect(response.body.expiresIn).toBeUndefined();
-            expect(response.body.token).toBeUndefined();
-            expect(response.body.message).toBe("User already exists with this email");
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
+            const createResponse = await apiPost(endpointUrl, initialUsers[1]);
+            expectBadRequestResponse(createResponse);
+            const expectedBody = { message: 'User already exists with this email' };
+            expect(createResponse.body).toEqual(expectedBody);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to create user because the email is not valid', async () => {
             const newUser = { email: "newemailexample.com", password: "newPassword#123" };
-
-            const response = await api.post('/api/v1/auth/register').send(newUser);
-
-            expectBadRequestResponse(response);
-
-            expect(response.body.expiresIn).toBeUndefined();
-            expect(response.body.token).toBeUndefined();
-            expect(response.body.errors).toEqual(expect.arrayContaining([
-                { value: 'newemailexample.com', msg: 'Email must be valid', param: 'email', location: 'body' }
-            ]));
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
+            const createResponse = await apiPost(endpointUrl, newUser);
+            expectBadRequestResponse(createResponse);
+            expectBadRequiredBodyAttribute(createResponse, "Email must be valid");
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to create user because because the password is less than 6 characters', async () => {
             const newUser = { email: "newemail@example.com", password: "newPa" };
-
-            const response = await api.post('/api/v1/auth/register').send(newUser);
-
-            expectBadRequestResponse(response);
-
-            expect(response.body.expiresIn).toBeUndefined();
-            expect(response.body.token).toBeUndefined();
-            expect(response.body.errors).toEqual(expect.arrayContaining([
-                { value: 'newPa', msg: 'Password must be at least 6 characters', param: 'password', location: 'body' }
-            ]));
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
+            const createResponse = await apiPost(endpointUrl, newUser);
+            expectBadRequestResponse(createResponse);
+            expectBadRequiredBodyAttribute(createResponse, "Password must be at least 6 characters");
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
         });
 
-        test('failed to create the user because there is no email', async () => {
-            await expectIncompleteRequiredBody(
-                '/api/v1/auth/register',
-                { password: "newPassword#123" },
-                'Email is required'
-            );
-        });
-
-        test('failed to create the user because there is no password', async () => {
-            await expectIncompleteRequiredBody(
-                '/api/v1/auth/register',
-                { email: "newemail@example.com" },
-                'Password is required'
-            );
+        test('failed to create the user because there is no email and password', async () => {
+            const createResponse = await apiPost(endpointUrl, {});
+            expectBadRequestResponse(createResponse);
+            expectBadRequiredBodyAttribute(createResponse, "Email is required");
+            expectBadRequiredBodyAttribute(createResponse, "Password is required");
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
         });
     });
 
     describe('login a user', () => {
+        const endpointUrl = '/auth/login';
+
         test('user logged in successfully', async () => {
-            const user = { email: initialUsers[1].email, password: initialUsers[1].password };
-
-            const response = await api.post('/api/v1/auth/login').send(user);
-
-            expectSuccessfulRequestResponse(response);
-
-            expect(response.body.expiresIn).toBeTruthy();
-            expect(response.body.expiresIn).toBe(900);
-            expect(response.body.token).toBeTruthy();
-            expect(response.body.token.length).toBeGreaterThan(0);
+            const createResponse = await apiPost(endpointUrl, initialUsers[1]);
+            expectSuccessfulRequestResponse(createResponse);
+            expect(createResponse.body.expiresIn).toBe(900);
+            expect(createResponse.body.token.length).toBeGreaterThan(0);
         });
 
         test('failed to login the user because there is no user with the email', async () => {
             const user = { email: "newemail@example.com", password: initialUsers[1].password };
-
-            const response = await api.post('/api/v1/auth/login').send(user);
-
-            expectNotFoundResponse(response);
-
-            expect(response.body.expiresIn).toBeUndefined();
-            expect(response.body.token).toBeUndefined();
-            expect(response.body.message).toBe("Invalid email or password");
+            const createResponse = await apiPost(endpointUrl, user);
+            expectNotFoundResponse(createResponse);
+            const expectedBody = { message: 'Invalid email or password' };
+            expect(createResponse.body).toEqual(expectedBody);
         });
 
         test('failed to login the user because the password is incorrect', async () => {
             const user = { email: initialUsers[1].email, password: "newPassword#123" };
-
-            const response = await api.post('/api/v1/auth/login').send(user);
-
-            expectNotFoundResponse(response);
-
-            expect(response.body.expiresIn).toBeUndefined();
-            expect(response.body.token).toBeUndefined();
-            expect(response.body.message).toBe("Invalid email or password");
+            const createResponse = await apiPost(endpointUrl, user);
+            expectNotFoundResponse(createResponse);
+            const expectedBody = { message: 'Invalid email or password' };
+            expect(createResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to login the user because there is no email', async () => {
-            await expectIncompleteRequiredBody(
-                '/api/v1/auth/login',
-                { password: "newPassword#123" },
-                'Email is required'
-            );
-        });
-
-        test('failed to login the user because there is no password', async () => {
-            await expectIncompleteRequiredBody(
-                '/api/v1/auth/login',
-                { email: "newemail@example.com" },
-                'Password is required'
-            );
+        test('failed to login the user because there is no email and password', async () => {
+            const createResponse = await apiPost(endpointUrl, {});
+            expectBadRequestResponse(createResponse);
+            expectBadRequiredBodyAttribute(createResponse, "Email is required");
+            expectBadRequiredBodyAttribute(createResponse, "Password is required");
         });
     });
 
     describe('delete a logged in user', () => {
+        const endpointUrl = '/auth';
+
         test('user deleted successfully', async () => {
-            const user = { email: initialUsers[1].email, password: initialUsers[1].password };
-
-            const response = await api.post('/api/v1/auth/login').send(user);
-            expectSuccessfulRequestResponse(response);
-
-            const token = response.body.token;
-            const responseDelete = await api.delete('/api/v1/auth').set('Authorization', `Bearer ${token}`);
-
-            expectSuccessfulRequestResponse(responseDelete);
-
-            expect(responseDelete.body.message).toBeTruthy();
-            expect(responseDelete.body.message).toBe("Account deleted");
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length - 1);
+            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            expectSuccessfulRequestResponse(deleteResponse);
+            const expectedBody = { message: 'Account deleted' };
+            expect(deleteResponse.body).toEqual(expectedBody);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length - 1);
         });
 
         test('failed to delete a user because the user does not exist', async () => {
-            const user = { email: initialUsers[1].email, password: initialUsers[1].password };
-
-            const response = await api.post('/api/v1/auth/login').send(user);
-
-            expectSuccessfulRequestResponse(response);
-
-            const token = response.body.token;
-            const responseDelete = await api.delete('/api/v1/auth').set('Authorization', `Bearer ${token}`);
-
-            expectSuccessfulRequestResponse(responseDelete);
-
-            const responseDelete2 = await api.delete('/api/v1/auth').set('Authorization', `Bearer ${token}`);
-
-            expectNotFoundResponse(responseDelete2);
-
-            expect(responseDelete2.body.message).toBeTruthy();
-            expect(responseDelete2.body.message).toBe("Invalid user");
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length - 1);
+            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            expectSuccessfulRequestResponse(deleteResponse);
+            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, token);
+            expectNotFoundResponse(deleteResponse2);
+            const expectedBody = { message: 'Invalid user' };
+            expect(deleteResponse2.body).toEqual(expectedBody);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length - 1);
         });
 
         test('failed to delete a user because the token is not valid', async () => {
-            const user = { email: initialUsers[1].email, password: initialUsers[1].password };
-
-            const response = await api.post('/api/v1/auth/login').send(user);
-
-            expectSuccessfulRequestResponse(response);
-
             const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const responseDelete = await api.delete('/api/v1/auth').set('Authorization', `Bearer ${token}`);
-
-            expectUnauthorizedResponse(responseDelete);
-            expectTokenErrorMessageReceived(responseDelete);
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            expectUnauthorizedResponse(deleteResponse);
+            expectTokenErrorMessageReceived(deleteResponse);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to delete a user because there is no token', async () => {
-            const user = { email: initialUsers[1].email, password: initialUsers[1].password };
+            const deleteResponse = await apiDelete(endpointUrl);
+            expectUnauthorizedResponse(deleteResponse);
+            const expectedBody = { message: 'Not authorized' };
+            expect(deleteResponse.body).toEqual(expectedBody);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+        });
 
-            const response = await api.post('/api/v1/auth/login').send(user);
-
-            expectSuccessfulRequestResponse(response);
-
-            const responseDelete = await api.delete('/api/v1/auth');
-
-            expectUnauthorizedResponse(responseDelete);
-
-            expect(responseDelete.body.message).toBeTruthy();
-            expect(responseDelete.body.message).toBe("Not authorized");
-
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
+        test('failed to delete a user because the token is expired', async () => {
+            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
+            const deleteResponse = await after1s(apiDeleteWithAuth,endpointUrl, token);  // token expires after 1 second
+            expectUnauthorizedResponse(deleteResponse);
+            expectTokenExpiredErrorMessageReceived(deleteResponse);
+            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
         });
     });
 

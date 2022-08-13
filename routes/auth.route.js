@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, register, refreshToken, logout, deleteAccount } from '../controllers/auth.controller.js';
+import { login, register, refreshToken, logout, deleteAccount, testingLogin } from '../controllers/auth.controller.js';
 import { requireRefreshToken } from '../middlewares/requireRefreshToken.js';
 import { requireToken } from '../middlewares/requireToken.js';
 import { bodyLoginValidator, bodyRegisterValidator } from '../middlewares/authValidatorManager.js';
@@ -55,6 +55,32 @@ router.post('/register', bodyRegisterValidator, register);
  *                          $ref: '#/components/schemas/TokenResponse'
  */
 router.post('/login', bodyLoginValidator, login);
+
+
+
+/**
+ * swagger
+ * /api/v1/auth/login/test:
+ *  post:
+ *      summary: Login a user (testing token with expiration in 1 second)
+ *      tags: [User]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/UserResponse'
+ *      responses:
+ *          200:
+ *              description: User logged in
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          $ref: '#/components/schemas/TokenResponse'
+ */
+router.post('/login/test', bodyLoginValidator, testingLogin);
 
 
 

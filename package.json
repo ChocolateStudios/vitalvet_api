@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "cross-env MODE=test node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --silent",
+    "test": "cross-env MODE=test node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --silent --runInBand",
     "test:watch": "npm run test -- --watchAll"
   },
   "keywords": [],

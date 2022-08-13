@@ -23,6 +23,17 @@ export const login = async (req, res) => {
     }
 };
 
+export const testingLogin = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const tokenResponse = await AuthService.testingLogin(email, password, res);
+        return res.status(200).json(tokenResponse);
+    } catch (error) {
+        const { code, message } = exceptionResponse(error);
+        return res.status(code).json({ message });
+    }
+};
+
 export const deleteAccount = async (req, res) => {
     try {
         await AuthService.deleteAccount(req.uid);

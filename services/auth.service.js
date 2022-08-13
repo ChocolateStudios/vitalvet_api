@@ -1,6 +1,6 @@
 import { customException } from "../exceptions/exceptionResponse.js";
 import { User } from "../models/User.js";
-import { generateRefreshToken, generateToken } from "../utils/tokenManager.js";
+import { generateRefreshToken, generateTestToken, generateToken } from "../utils/tokenManager.js";
 
 export class AuthService {
     static async register(email, password, res) {
@@ -30,6 +30,23 @@ export class AuthService {
             throw new customException(404, "Invalid email or password");
 
         const { token, expiresIn } = generateToken(user.id);
+        generateRefreshToken(user.id, res);
+
+        return { token, expiresIn };
+    };
+
+    static async testingLogin (email, password, res) {
+        const user = await User.findOne({ where: { email } });
+        
+        if (!user)
+            throw new customException(404, "Invalid email or password");
+
+        const passwordCompareResult = await user.comparePassword(password);
+
+        if (!passwordCompareResult)
+            throw new customException(404, "Invalid email or password");
+
+        const { token, expiresIn } = generateTestToken(user.id);
         generateRefreshToken(user.id, res);
 
         return { token, expiresIn };

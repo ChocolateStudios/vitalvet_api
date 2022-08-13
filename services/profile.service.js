@@ -26,7 +26,7 @@ export class ProfileService {
             name: profile.name,
             lastname: profile.lastname,
             birthday: profile.birthday,
-            picture: profile.picture,
+            picture: profile.picture ? profile.picture : null,
             admin: profile.admin,
             college: profile.college,
             review: profile.review,
@@ -48,8 +48,9 @@ export class ProfileService {
         if (!profile)
             throw new customException(404, "Profile not found for this user");
 
-        const { name, lastname, birthday, picture, college, review } = body;
+        const { name, lastname, birthday, college, review } = body;
         const admin = profile.admin;
+        const picture = body.picture ? body.picture : null;
 
         profile.set({ name, lastname, birthday, picture, admin, college, review });
         await profile.save();
