@@ -12,7 +12,7 @@ export class MedicalAttentionRepository {
     }
 
     static async getMedicalAttentionsByPatientId(patientId){
-        return await MedicalAttention.findOne({
+        return await MedicalAttention.findAll({
             where: {
                 patientId
             }
@@ -20,7 +20,7 @@ export class MedicalAttentionRepository {
     }
 
     static async getMedicalAttentionsByProfileId(profileId){
-        return await MedicalAttention.findOne({
+        return await MedicalAttention.findAll({
             where: {
                 profileId
             }
@@ -28,7 +28,7 @@ export class MedicalAttentionRepository {
     }
 
     static async getMedicalAttentionsByDate(date){
-        return await MedicalAttention.findOne({
+        return await MedicalAttention.findAll({
             where: {
                 date: Date.parse(date)
             }
@@ -44,7 +44,9 @@ export class MedicalAttentionRepository {
                     initialDate: Date.parse(initialDate),
                     finalDate: Date.parse(finalDate)
                 },
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                model: MedicalAttention,
+                mapToModel:  true
             }
         );
     }
