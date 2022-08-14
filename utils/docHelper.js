@@ -265,6 +265,27 @@
  *        example:
  *          name: Apronax
  * 
+ *      DocumentFileSubmission:
+ *        type: object
+ *        properties:
+ *          name:
+ *           type: string
+ *          link:
+ *           type: string
+ *          type:
+ *           type: string
+ *        required:
+ *          - link
+ *          - type
+ *        example:
+ *          name: Pepe_profile_image
+ *          link: https://www.example.com/image.png
+ *          type: IMAGE_PNG
+ * 
+ *      DocumentFileTypeEnum:
+ *        type: string
+ *        enum: ['IMAGE_JPG', 'IMAGE_PNG', 'IMAGE_SVG', 'TEXT_TXT', 'TEXT_PDF', 'TEXT_WORD', 'SPREADSHEET_EXCEL', 'PRESENTATION_PPT']
+ * 
  * 
  * 
  * 

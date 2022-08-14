@@ -5,33 +5,33 @@ import { requireToken } from '../middlewares/requireToken.js';
 
 const router = Router();
 
-/**
- * @swagger
- * /api/v1/profiles:
- *  post:
- *      summary: Register profile of logged in user
- *      tags: [Profiles]
- *      security:
- *          - BearerAuth: []
- *      requestBody:
- *          required: true
- *          content:
- *              application/json:
- *                  schema:
- *                      type: object
- *                      $ref: '#/components/schemas/ProfileSubmission'
- *      responses:
- *          201:
- *              description: Profile created
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          $ref: '#/components/schemas/ProfileResponse'
- *          401:
- *              $ref: '#/components/responses/UnauthorizedError'
- */
-router.post('/', requireToken, bodyProfileValidator, createProfile);
+    /**
+     * @swagger
+     * /api/v1/profiles:
+     *  post:
+     *      summary: Register profile of logged in user
+     *      tags: [Profiles]
+     *      security:
+     *          - BearerAuth: []
+     *      requestBody:
+     *          required: true
+     *          content:
+     *              application/json:
+     *                  schema:
+     *                      type: object
+     *                      $ref: '#/components/schemas/ProfileSubmission'
+     *      responses:
+     *          201:
+     *              description: Profile created
+     *              content:
+     *                  application/json:
+     *                      schema:
+     *                          type: object
+     *                          $ref: '#/components/schemas/ProfileResponse'
+     *          401:
+     *              $ref: '#/components/responses/UnauthorizedError'
+     */
+    router.post('/', requireToken, bodyProfileValidator, createProfile);
 
 
 /**

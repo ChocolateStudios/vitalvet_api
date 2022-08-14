@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { sequelize } from "../database/connectdb.js";
+import { sequelize } from "./connectdb.js";
 
 import { Owner } from "../models/Owner.js";
 import { EventType } from "../models/EventType.js";
@@ -9,6 +9,8 @@ import { Species } from "../models/Species.js";
 import { User } from "../models/User.js";
 import { Event } from "../models/Event.js";
 import { Medicine } from "../models/Medicine.js";
+import { DocumentFile } from "../models/DocumentFile.js";
+import { MedicalAttention } from "../models/MedicalAttention.js";
 
 
 
@@ -99,6 +101,29 @@ Event.belongsTo(EventType, {
     foreignKey: { name: "eventTypeId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "eventType"
 });
+
+
+// One-to-many relationship between Patient and DocumentFile with foreign key 'patientId' in DocumentFile
+Patient.hasMany(DocumentFile, {
+    foreignKey: { name: "patientId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
+});
+DocumentFile.hasMany(Patient, {
+    foreignKey: { name: "patientId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patient"
+});
+
+// One-to-many relationship between MedicalAttention and DocumentFile with foreign key 'medicalAttentionId' in DocumentFile
+MedicalAttention.hasMany(DocumentFile, {
+    foreignKey: { name: "medicalAttentionId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
+});
+DocumentFile.hasMany(MedicalAttention, {
+    foreignKey: { name: "medicalAttentionId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttention"
+});
+
+
 
 
 /************************************************
