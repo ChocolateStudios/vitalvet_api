@@ -52,7 +52,7 @@ export class ProfileService {
         const admin = profile.admin;
         const picture = body.picture ? body.picture : null;
 
-        profile.set({ name, lastname, birthday, picture, admin, college, review });
+        profile.set({ name, lastname, birthday, picture, college, review });
         await profile.save();
 
         return profile;

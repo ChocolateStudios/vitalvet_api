@@ -1,29 +1,16 @@
 import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { User } from "../models/User.js";
-import { api, expectSuccessfulCreation, expectBadRequestResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectIncompleteRequiredBody, expectUnauthorizedResponse, expectTokenErrorMessageReceived, initialUsers, apiPost, expectLengthOfDatabaseRecordsToBeTheSameWith, expectBadRequiredBodyAttribute, apiLoginUser, apiDeleteWithAuth, apiDelete, apiLoginTestUser, after1s, expectTokenExpiredErrorMessageReceived } from "./testCommon.js";
+import { api, expectSuccessfulCreation, expectBadRequestResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectIncompleteRequiredBody, expectUnauthorizedResponse, expectTokenErrorMessageReceived, initialUsers, apiPost, expectLengthOfDatabaseInstancesToBeTheSameWith, expectBadRequiredBodyAttribute, apiLoginUser, apiDeleteWithAuth, apiDelete, apiLoginTestUser, after1s, expectTokenExpiredErrorMessageReceived, ensureOnlyInitialInstancesExist, expectOnlyInitialInstancesInDatabase, compareUserFunc } from "./testCommon.js";
 
 describe('user enpoints', () => {
     beforeEach(async () => {
-        await User.destroy({ where: {} });
-
-        for (let user of initialUsers) {
-            await User.create(user);
-        }
+        await ensureOnlyInitialInstancesExist(User, initialUsers, compareUserFunc);
     });
 
     describe('test scenary ready', () => {
-        test('expected number of initial users', async () => {
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
-        });
-
         test('expected initial users', async () => {
-            const users = await User.findAll();
-
-            for (let i = 0; i < users.length; i++) {
-                expect(users[i].email).toBe(initialUsers[i].email);
-            }
+            expectOnlyInitialInstancesInDatabase(User, initialUsers, compareUserFunc);
         });
     });
 
@@ -36,7 +23,7 @@ describe('user enpoints', () => {
             expectSuccessfulCreation(createResponse);
             expect(createResponse.body.expiresIn).toBe(900);
             expect(createResponse.body.token.length).toBeGreaterThan(0);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length + 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length + 1);
         });
 
         test('failed to create user because there is already another user with the same email', async () => {
@@ -44,7 +31,7 @@ describe('user enpoints', () => {
             expectBadRequestResponse(createResponse);
             const expectedBody = { message: 'User already exists with this email' };
             expect(createResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to create user because the email is not valid', async () => {
@@ -52,7 +39,7 @@ describe('user enpoints', () => {
             const createResponse = await apiPost(endpointUrl, newUser);
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Email must be valid");
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to create user because because the password is less than 6 characters', async () => {
@@ -60,7 +47,7 @@ describe('user enpoints', () => {
             const createResponse = await apiPost(endpointUrl, newUser);
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Password must be at least 6 characters");
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to create the user because there is no email and password', async () => {
@@ -68,7 +55,7 @@ describe('user enpoints', () => {
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Email is required");
             expectBadRequiredBodyAttribute(createResponse, "Password is required");
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
     });
 
@@ -115,7 +102,7 @@ describe('user enpoints', () => {
             expectSuccessfulRequestResponse(deleteResponse);
             const expectedBody = { message: 'Account deleted' };
             expect(deleteResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length - 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length - 1);
         });
 
         test('failed to delete a user because the user does not exist', async () => {
@@ -126,7 +113,7 @@ describe('user enpoints', () => {
             expectNotFoundResponse(deleteResponse2);
             const expectedBody = { message: 'Invalid user' };
             expect(deleteResponse2.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length - 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length - 1);
         });
 
         test('failed to delete a user because the token is not valid', async () => {
@@ -134,7 +121,7 @@ describe('user enpoints', () => {
             const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
             expectUnauthorizedResponse(deleteResponse);
             expectTokenErrorMessageReceived(deleteResponse);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to delete a user because there is no token', async () => {
@@ -142,7 +129,7 @@ describe('user enpoints', () => {
             expectUnauthorizedResponse(deleteResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(deleteResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
         test('failed to delete a user because the token is expired', async () => {
@@ -150,7 +137,7 @@ describe('user enpoints', () => {
             const deleteResponse = await after1s(apiDeleteWithAuth,endpointUrl, token);  // token expires after 1 second
             expectUnauthorizedResponse(deleteResponse);
             expectTokenExpiredErrorMessageReceived(deleteResponse);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(User, initialUsers.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
     });
 

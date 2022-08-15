@@ -1,8 +1,9 @@
 import supertest from "supertest";
 import { app } from "../index.js";
-import { jest } from '@jest/globals'
+import { jest } from '@jest/globals';
+import { User } from "../models/User.js";
 
-jest.setTimeout(20000); // 20 second
+jest.setTimeout(60000); // 60 seconds
 export const api = supertest(app);
 
 
@@ -101,9 +102,27 @@ export const expectBadRequiredBodyAttribute = (response, messageResponse) => {
     expect(errorReceived).toBe(true);
 }
 
-export const expectLengthOfDatabaseRecordsToBeTheSameWith = async (Model, length) => {
-    const records = await Model.findAll();
-    expect(records.length).toBe(length);
+export const expectLengthOfDatabaseInstancesToBeTheSameWith = async (Model, length) => {
+    const instancesInDatabase = await Model.findAll();
+    expect(instancesInDatabase.length).toBe(length);
+};
+
+export const expectOnlyInitialInstancesInDatabase = async (Model, initialInstances, compareFunc) => {
+    let instancesInDatabase = await Model.findAll();
+    expect(instancesInDatabase.length).toBe(initialInstances.length);
+    
+    for (let initialInstance of initialInstances) {
+        let isInitialInstance = false;
+        for (let instanceInDatabase of instancesInDatabase) {
+            const condition = await compareFunc(instanceInDatabase, initialInstance);
+            if (condition) {
+                isInitialInstance = true;
+                instancesInDatabase.splice(instancesInDatabase.indexOf(instanceInDatabase), 1);
+                break;
+            }
+        }
+        expect(isInitialInstance).toBe(true);
+    }
 };
 
 
@@ -173,9 +192,11 @@ export const apiGetWithAuth = async (route, token) => {
 
 export const after1s = (apiFunc, ...args) => {
     return new Promise((resolve, reject) => {
-        setTimeout(async () => {  resolve(await apiFunc(...args)); }, 1000);
+        setTimeout(async () => { resolve(await apiFunc(...args)); }, 1000);
     });
 };
+
+
 
 
 
@@ -188,7 +209,7 @@ export const initialUsers = [
     { email: "secondemail@example.com", password: "secondPassword#321" }
 ]
 
-export let initialProfiles = [
+export const initialProfiles = [
     {
         name: 'Primer',
         lastname: 'Ejemplo',
@@ -197,7 +218,10 @@ export let initialProfiles = [
         admin: true,
         college: 'Universidad Nacional de Colombia',
         review: 'Lorem ipsum dolor sit amet, consectetur',
-        userId: 1
+        replaceWithFunc: async () => {
+            const user = await User.findOne({ where: { email: 'firstemail@example.com' } });
+            return { name: "userId", value: user.id };
+        }
     },
     {
         name: 'Segundo',
@@ -207,16 +231,132 @@ export let initialProfiles = [
         admin: false,
         college: 'Universidad Nacional de Peru',
         review: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
-        userId: 2
+        replaceWithFunc: async () => {
+            const user = await User.findOne({ where: { email: 'secondemail@example.com' } });
+            return { name: "userId", value: user.id };
+        }
     }
+]
+
+// export const initialProfiles = [
+//     {
+//         name: 'Primer',
+//         lastname: 'Ejemplo',
+//         birthday: "1987-06-24",
+//         picture: 'http://www.example.com/image.png',
+//         admin: true,
+//         college: 'Universidad Nacional de Colombia',
+//         review: 'Lorem ipsum dolor sit amet, consectetur',
+//         userId: 1
+//     },
+//     {
+//         name: 'Segundo',
+//         lastname: 'Ejemplo',
+//         birthday: "2002-04-15",
+//         picture: 'http://www.example.com/image.png',
+//         admin: false,
+//         college: 'Universidad Nacional de Peru',
+//         review: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
+//         userId: 2
+//     }
+// ]
+
+export const initialSpecies = [
+    { name: "Perro" }, { name: "Gato" }
+]
+export const initialSubspecies = [
+    { name: "Bulldog" }, { name: "Pastor alemán" }, // dog subspecies
+    { name: "Bengala" }, { name: "Ragdoll" }        // cat subspecies
 ]
 
 
 
+
+
 /************************************************
-************* Data Examples Helpers *************
+***************** Other Helpers *****************
 *************************************************/
 
+const detectInitialInstancesChanges = async (initialInstances) => {
+    for (let initialInstance of initialInstances) {
+        let notContainsFunc = true;
+        for (const propertyOfInstance in initialInstance) {
+            if (propertyOfInstance.includes('replaceWithFunc')) {
+                const { name, value } = await initialInstance[propertyOfInstance]();
+                delete initialInstance[propertyOfInstance];
+                initialInstance[name] = value;
+                notContainsFunc = false;
+            }
+        }
+        if (notContainsFunc)
+            return;
+    }
+};
+
+export const ensureOnlyInitialInstancesExist = async (Model, initialInstances, compareFunc) => {
+    let instancesInDatabase = await Model.findAll();
+    let _initialInstances = initialInstances.map(element => { return { ...element } });
+    await detectInitialInstancesChanges(_initialInstances);
+
+    for (let instanceInDatabase of instancesInDatabase) {
+        let isInitialInstance = false;
+        for (let initialInstance of _initialInstances) {
+            const condition = await compareFunc(instanceInDatabase, initialInstance);
+            if (condition) {
+                isInitialInstance = true;
+                break;
+            }
+        }
+        if (!isInitialInstance) {
+            await instanceInDatabase.destroy();
+            instancesInDatabase.splice(instancesInDatabase.indexOf(instanceInDatabase), 1);
+        }
+    }
+
+    for (let initialInstance of _initialInstances) {
+        let isMissingInstance = true;
+        for (let instanceInDatabase of instancesInDatabase) {
+            const condition = await compareFunc(instanceInDatabase, initialInstance);
+            if (condition) {
+                isMissingInstance = false;
+                break;
+            }
+        }
+        if (isMissingInstance) {
+            let createdInstance = await Model.create(initialInstance);
+            instancesInDatabase.push(createdInstance);
+        }
+    }
+    return instancesInDatabase;
+}
+
+
+
+
+
+/************************************************
+***************** Other Helpers *****************
+*************************************************/
+
+export const compareUserFunc = async (userInDatabase, initialUser) => {
+    const sameEmail = userInDatabase.email === initialUser.email;
+    const samePassword = await userInDatabase.comparePassword(initialUser.password);
+    return sameEmail && samePassword;
+};
+
+export const compareProfileFunc = async (profileInDatabase, initialProfile) => {
+    const sameName = profileInDatabase.name === initialProfile.name;
+    const sameLastname = profileInDatabase.lastname === initialProfile.lastname;
+    return sameName && sameLastname;
+};
+
+
+
+
+
+/************************************************
+************** Data Random Helpers **************
+*************************************************/
 
 export const getRandInteger = (min, max) => {
     return Math.floor(Math.random() * (max - min)) + min;

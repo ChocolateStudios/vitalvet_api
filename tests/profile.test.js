@@ -2,54 +2,24 @@ import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { Profile } from '../models/Profile.js';
 import { User } from '../models/User.js';
-import { api, initialUsers, initialProfiles, expectSuccessfulCreation, expectBadRequestResponse, expectUnauthorizedResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectBadRequiredBodyAttribute, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, apiLoginUser, apiGetWithAuth, apiLoginTestUser, after1s, apiGet, apiDeleteWithAuth, apiDelete, apiPut, apiPutWithAuth, apiPost, apiRegisterUser, apiPostWithAuth, expectLengthOfDatabaseRecordsToBeTheSameWith, expectUnauthorizedActionResponse } from './testCommon.js';
+import { api, initialUsers, initialProfiles, expectSuccessfulCreation, expectBadRequestResponse, expectUnauthorizedResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectBadRequiredBodyAttribute, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, apiLoginUser, apiGetWithAuth, apiLoginTestUser, after1s, apiGet, apiDeleteWithAuth, apiDelete, apiPut, apiPutWithAuth, apiPost, apiRegisterUser, apiPostWithAuth, expectLengthOfDatabaseInstancesToBeTheSameWith, expectUnauthorizedActionResponse, ensureOnlyInitialInstancesExist, compareUserFunc, compareProfileFunc, expectOnlyInitialInstancesInDatabase } from './testCommon.js';
 
-let iUsers = [];
-let iProfiles = [];
+let initUsers = [];
+let initProfiles = [];
 
 describe('profile endpoints', () => {
     beforeEach(async () => {
-        await Profile.destroy({ where: {} });
-        await User.destroy({ where: {} });
-        iUsers = [];
-        iProfiles = [];
-
-        for (let user of initialUsers) {
-            iUsers.push(await User.create(user));
-        }
-
-        for (let i = 0; i < initialProfiles.length; i++) {
-            const profile = initialProfiles[i];
-            profile.userId = iUsers[i].id;
-            iProfiles.push(await Profile.create(profile));
-        }
+        initUsers = await ensureOnlyInitialInstancesExist(User, initialUsers, compareUserFunc);
+        initProfiles = await ensureOnlyInitialInstancesExist(Profile, initialProfiles, compareProfileFunc);
     });
 
-    describe('test scenary ready', () => {
-        test('expected number of initial users', async () => {
-            const users = await User.findAll();
-            expect(users.length).toBe(initialUsers.length);
-        });
-
+    describe('test scenary ready', () => {        
         test('expected initial users', async () => {
-            const users = await User.findAll();
-
-            for (let i = 0; i < users.length; i++) {
-                expect(users[i].email).toBe(initialUsers[i].email);
-            }
+            await expectOnlyInitialInstancesInDatabase(User, initialUsers, compareUserFunc);
         });
-
-        test('expected number of initial profiles', async () => {
-            const profiles = await Profile.findAll();
-            expect(profiles.length).toBe(initialProfiles.length);
-        });
-
+        
         test('expected initial profiles', async () => {
-            const profiles = await Profile.findAll();
-
-            for (let i = 0; i < profiles.length; i++) {
-                expect(profiles[i].name).toBe(initialProfiles[i].name);
-            }
+            await expectOnlyInitialInstancesInDatabase(Profile, initialProfiles, compareProfileFunc);
         });
     });
 
@@ -70,7 +40,7 @@ describe('profile endpoints', () => {
             const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
             expectSuccessfulCreation(createResponse);
             const expectedBody = {
-                id: iProfiles[iProfiles.length - 1].id + 1,
+                id: createResponse.body.id,
                 name: newProfile.name,
                 lastname: newProfile.lastname,
                 birthday: newProfile.birthday,
@@ -79,12 +49,12 @@ describe('profile endpoints', () => {
                 college: newProfile.college,
                 review: newProfile.review,
                 user: {
-                    id: iUsers[iUsers.length - 1].id + 1,
+                    id: createResponse.body.user.id,
                     email: newUser.email
                 }
             };
             expect(createResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length + 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length + 1);
         });
 
         test('profile created successfully with no picture', async () => {
@@ -100,7 +70,7 @@ describe('profile endpoints', () => {
             const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
             expectSuccessfulCreation(createResponse);
             const expectedBody = {
-                id: iProfiles[iProfiles.length - 1].id + 1,
+                id: createResponse.body.id,
                 name: newProfile.name,
                 lastname: newProfile.lastname,
                 birthday: newProfile.birthday,
@@ -109,12 +79,12 @@ describe('profile endpoints', () => {
                 college: newProfile.college,
                 review: newProfile.review,
                 user: {
-                    id: iUsers[iUsers.length - 1].id + 1,
+                    id: createResponse.body.user.id,
                     email: newUser.email
                 }
             };
             expect(createResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length + 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length + 1);
         });
 
         test('failed to create a profile because a profile already exists for this user', async () => {
@@ -130,7 +100,7 @@ describe('profile endpoints', () => {
             expectBadRequestResponse(createResponse);
             const expectedBody = { message: 'Profile already exists for this user' };
             expect(createResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
         test('failed to create a profile because the user does not exist', async () => {
@@ -148,7 +118,7 @@ describe('profile endpoints', () => {
             expectNotFoundResponse(createResponse);
             const expectedBody = { message: 'Invalid user' };
             expect(createResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length - 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length - 1);
         });
 
         test('failed to create a profile because the user is not logged in', async () => {
@@ -164,7 +134,7 @@ describe('profile endpoints', () => {
             expectUnauthorizedResponse(createResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(createResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
         test('failed to create a profile because there is no name, lastname, birthday, college and review', async () => {
@@ -178,7 +148,7 @@ describe('profile endpoints', () => {
             expectBadRequiredBodyAttribute(createResponse, "Birthday is required");
             expectBadRequiredBodyAttribute(createResponse, "College is required");
             expectBadRequiredBodyAttribute(createResponse, "Review is required");
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
         test('failed to create a profile because the data types of name, lastname, birthday, picture, college and review are incorrect', async () => {
@@ -196,7 +166,7 @@ describe('profile endpoints', () => {
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Birthday must be a date");
             expectBadRequiredBodyAttribute(createResponse, "Picture must be a url");
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
     });
 
@@ -216,7 +186,7 @@ describe('profile endpoints', () => {
             const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
             expectSuccessfulRequestResponse(updateResponse);
             const expectedBody = {
-                id: iProfiles[1].id,
+                id: updateResponse.body.id,
                 name: newProfile.name,
                 lastname: newProfile.lastname,
                 birthday: newProfile.birthday,
@@ -225,8 +195,8 @@ describe('profile endpoints', () => {
                 college: newProfile.college,
                 review: newProfile.review,
                 user: {
-                    id: iUsers[1].id,
-                    email: iUsers[1].email
+                    id: updateResponse.body.user.id,
+                    email: initUsers[1].email
                 }
             };
             expect(updateResponse.body).toEqual(expectedBody);
@@ -244,7 +214,7 @@ describe('profile endpoints', () => {
             const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
             expectSuccessfulRequestResponse(updateResponse);
             const expectedBody = {
-                id: iProfiles[1].id,
+                id: updateResponse.body.id,
                 name: newProfile.name,
                 lastname: newProfile.lastname,
                 birthday: newProfile.birthday,
@@ -253,8 +223,8 @@ describe('profile endpoints', () => {
                 college: newProfile.college,
                 review: newProfile.review,
                 user: {
-                    id: iUsers[1].id,
-                    email: iUsers[1].email
+                    id: updateResponse.body.user.id,
+                    email: initUsers[1].email
                 }
             };
             expect(updateResponse.body).toEqual(expectedBody);
@@ -348,21 +318,21 @@ describe('profile endpoints', () => {
             expectSuccessfulRequestResponse(deleteResponse);
 
             const expectedBody = {
-                id: iProfiles[1].id,
-                name: iProfiles[1].name,
-                lastname: iProfiles[1].lastname,
-                birthday: iProfiles[1].birthday,
-                picture: iProfiles[1].picture,
-                admin: iProfiles[1].admin,
-                college: iProfiles[1].college,
-                review: iProfiles[1].review,
+                id: initProfiles[1].id,
+                name: initProfiles[1].name,
+                lastname: initProfiles[1].lastname,
+                birthday: initProfiles[1].birthday,
+                picture: initProfiles[1].picture,
+                admin: initProfiles[1].admin,
+                college: initProfiles[1].college,
+                review: initProfiles[1].review,
                 user: {
-                    id: iUsers[1].id,
-                    email: iUsers[1].email
+                    id: initUsers[1].id,
+                    email: initUsers[1].email
                 }
             };
             expect(deleteResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length - 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length - 1);
         });
 
         test('failed to delete the profile because the profile does not exist', async () => {
@@ -373,7 +343,7 @@ describe('profile endpoints', () => {
             expectNotFoundResponse(deleteResponse2);
             const expectedBody = { message: 'Profile not found for this user' };
             expect(deleteResponse2.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length - 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length - 1);
         });
 
         test('failed to delete the profile because the user does not exist', async () => {
@@ -384,7 +354,7 @@ describe('profile endpoints', () => {
             expectNotFoundResponse(deleteResponse2);
             const expectedBody = { message: 'Invalid user' };
             expect(deleteResponse2.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length - 1);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length - 1);
         });
 
         test('failed to delete the profile because the token is not valid', async () => {
@@ -392,7 +362,7 @@ describe('profile endpoints', () => {
             const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
             expectUnauthorizedResponse(deleteResponse);
             expectTokenErrorMessageReceived(deleteResponse);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
         test('failed to delete the profile because there is no token', async () => {
@@ -400,7 +370,7 @@ describe('profile endpoints', () => {
             expectUnauthorizedResponse(deleteResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(deleteResponse.body).toEqual(expectedBody);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
         test('failed to delete the profile because the token is expired', async () => {
@@ -408,7 +378,7 @@ describe('profile endpoints', () => {
             const deleteResponse = await after1s(apiDeleteWithAuth,endpointUrl, token);  // token expires after 1 second
             expectUnauthorizedResponse(deleteResponse);
             expectTokenExpiredErrorMessageReceived(deleteResponse);
-            await expectLengthOfDatabaseRecordsToBeTheSameWith(Profile, initialProfiles.length);
+            await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
     });
 
@@ -421,17 +391,17 @@ describe('profile endpoints', () => {
             expectSuccessfulRequestResponse(getResponse);
 
             const expectedBody = {
-                id: iProfiles[1].id,
-                name: iProfiles[1].name,
-                lastname: iProfiles[1].lastname,
-                birthday: iProfiles[1].birthday,
-                picture: iProfiles[1].picture,
-                admin: iProfiles[1].admin,
-                college: iProfiles[1].college,
-                review: iProfiles[1].review,
+                id: initProfiles[1].id,
+                name: initProfiles[1].name,
+                lastname: initProfiles[1].lastname,
+                birthday: initProfiles[1].birthday,
+                picture: initProfiles[1].picture,
+                admin: initProfiles[1].admin,
+                college: initProfiles[1].college,
+                review: initProfiles[1].review,
                 user: {
-                    id: iUsers[1].id,
-                    email: iUsers[1].email
+                    id: initUsers[1].id,
+                    email: initUsers[1].email
                 }
             };
             expect(getResponse.body).toEqual(expectedBody);
@@ -487,7 +457,7 @@ describe('profile endpoints', () => {
             const getResponse = await apiGetWithAuth(endpointUrl, token);
             expectSuccessfulRequestResponse(getResponse);
             let i = 0;
-            const expectedBody = iProfiles.map(profile => {
+            const expectedBody = initProfiles.map(profile => {
                 return {
                     id: profile.id,
                     name: profile.name,
@@ -499,7 +469,7 @@ describe('profile endpoints', () => {
                     review: profile.review,
                     user: {
                         id: profile.userId,
-                        email: iUsers[i++].email
+                        email: initUsers[i++].email
                     }
                 };
             });
