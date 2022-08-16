@@ -65,7 +65,7 @@ describe('species endpoints', () => {
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to update species because there is already another species with the same name', async () => {
+        test('failed to update a species because there is already another species with the same name', async () => {
             const updateResponse = await apiPut(endpointUrl(initSpecies[1].id), initialSpecies[1]);
             expectBadRequestResponse(updateResponse);
             const expectedBody = { message: 'Another species already exists with this name' };

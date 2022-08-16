@@ -24,6 +24,9 @@ export class OwnerService {
 
         owner.set({ name, lastname, birthday, direction, phone, dni, email });
         await owner.save();
+        
+        owner.dni ? owner.dni = owner.dni : owner.dni = null;
+        owner.email ? owner.email = owner.email : owner.email = null;
 
         return owner;
     }

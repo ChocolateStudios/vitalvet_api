@@ -40,8 +40,8 @@ import { Constants } from '../constants/constants.js';
  *          lastname: Parker
  *          birthday: 2020-01-01
  *          direction: Av. Example 123 - Bogota
- *          phone: 999544555
- *          dni: 760987654
+ *          phone: "999544555"
+ *          dni: "760987654"
  *          email: hugo@example.com
  */
 

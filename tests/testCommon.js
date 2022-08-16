@@ -285,9 +285,18 @@ export const initialOwners = [
         lastname: "Parker",
         birthday: "2020-01-01",
         direction: "Av. Example 123 - Bogota",
-        phone: 999544555,
-        dni: 760987654,
+        phone: "999544555",
+        dni: "760987654",
         email: "hugo@example.com"
+    },
+    { 
+        name: "Jorge",
+        lastname: "Panza",
+        birthday: "2018-11-19",
+        direction: "Av. Example 578 - Canada",
+        phone: "997898555",
+        dni: "760457687",
+        email: "jorge@example.com"
     },
 ]
 
@@ -388,6 +397,14 @@ export const compareSpeciesWithSubspeciesFunc = async (speciesInDatabase, initia
         }
     }
     return sameName;
+};
+
+export const compareOwnerFunc = async (ownerInDatabase, initialOwner) => {
+    const sameName = ownerInDatabase.name === initialOwner.name;
+    const sameLastame = ownerInDatabase.lastname === initialOwner.lastname;
+    const sameDirection = ownerInDatabase.direction === initialOwner.direction;
+    const sameEmail = ownerInDatabase.email === initialOwner.email;
+    return sameName && sameLastame && sameDirection && sameEmail;
 };
 
 
