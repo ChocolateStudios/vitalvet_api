@@ -33,8 +33,7 @@ Species.init({
     name: {
         type: DataTypes.STRING(Constants.ONE_LINE_SIZE),
         allowNull: false,
-        notEmpty: true,
-        unique: true
+        notEmpty: true
     }
 }, {
     sequelize,

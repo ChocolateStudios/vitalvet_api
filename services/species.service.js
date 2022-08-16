@@ -44,13 +44,14 @@ export class SpeciesService {
         if (speciesCreated)
             throw new customException(400, "Another species already exists with this name");
 
-        const species = await SpeciesRepository.getSpeciesById(id);
+        let species = await SpeciesRepository.getSpeciesById(id);
 
         if (!species)
             throw new customException(404, "Species not found");
 
         species.set({ name });
         await species.save();
+        species.speciesId = undefined;
 
         return species;
     }
@@ -86,6 +87,7 @@ export class SpeciesService {
             throw new customException(404, "Species not found");
 
         await species.destroy();
+        species.speciesId = undefined;
 
         return species;
     }

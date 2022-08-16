@@ -2,22 +2,19 @@ import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { Profile } from '../models/Profile.js';
 import { User } from '../models/User.js';
-import { api, initialUsers, initialProfiles, expectSuccessfulCreation, expectBadRequestResponse, expectUnauthorizedResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectBadRequiredBodyAttribute, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, apiLoginUser, apiGetWithAuth, apiLoginTestUser, after1s, apiGet, apiDeleteWithAuth, apiDelete, apiPut, apiPutWithAuth, apiPost, apiRegisterUser, apiPostWithAuth, expectLengthOfDatabaseInstancesToBeTheSameWith, expectUnauthorizedActionResponse, ensureOnlyInitialInstancesExist, compareUserFunc, compareProfileFunc, expectOnlyInitialInstancesInDatabase } from './testCommon.js';
-
-let initUsers = [];
-let initProfiles = [];
+import { api, initialUsers, initialProfiles, expectSuccessfulCreation, expectBadRequestResponse, expectUnauthorizedResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectBadRequiredBodyAttribute, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, apiLoginUser, apiGetWithAuth, apiLoginTestUser, after1s, apiGet, apiDeleteWithAuth, apiDelete, apiPut, apiPutWithAuth, apiPost, apiRegisterUser, apiPostWithAuth, expectLengthOfDatabaseInstancesToBeTheSameWith, expectUnauthorizedActionResponse, ensureOnlyInitialInstancesExist, compareUserFunc, compareProfileFunc, expectOnlyInitialInstancesInDatabase, expectSameArrayBody } from './testCommon.js';
 
 describe('profile endpoints', () => {
     beforeEach(async () => {
-        initUsers = await ensureOnlyInitialInstancesExist(User, initialUsers, compareUserFunc);
-        initProfiles = await ensureOnlyInitialInstancesExist(Profile, initialProfiles, compareProfileFunc);
+        await ensureOnlyInitialInstancesExist(User, initialUsers, compareUserFunc);
+        await ensureOnlyInitialInstancesExist(Profile, initialProfiles, compareProfileFunc);
     });
 
-    describe('test scenary ready', () => {        
+    describe('test scenary ready', () => {
         test('expected initial users', async () => {
             await expectOnlyInitialInstancesInDatabase(User, initialUsers, compareUserFunc);
         });
-        
+
         test('expected initial profiles', async () => {
             await expectOnlyInitialInstancesInDatabase(Profile, initialProfiles, compareProfileFunc);
         });
@@ -25,7 +22,7 @@ describe('profile endpoints', () => {
 
     describe('register profile of logged in user', () => {
         const endpointUrl = '/profiles';
-        
+
         test('profile created successfully', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
             const token = (await apiRegisterUser(newUser)).body.token;
@@ -196,7 +193,7 @@ describe('profile endpoints', () => {
                 review: newProfile.review,
                 user: {
                     id: updateResponse.body.user.id,
-                    email: initUsers[1].email
+                    email: initialUsers[1].email
                 }
             };
             expect(updateResponse.body).toEqual(expectedBody);
@@ -224,7 +221,7 @@ describe('profile endpoints', () => {
                 review: newProfile.review,
                 user: {
                     id: updateResponse.body.user.id,
-                    email: initUsers[1].email
+                    email: initialUsers[1].email
                 }
             };
             expect(updateResponse.body).toEqual(expectedBody);
@@ -318,17 +315,17 @@ describe('profile endpoints', () => {
             expectSuccessfulRequestResponse(deleteResponse);
 
             const expectedBody = {
-                id: initProfiles[1].id,
-                name: initProfiles[1].name,
-                lastname: initProfiles[1].lastname,
-                birthday: initProfiles[1].birthday,
-                picture: initProfiles[1].picture,
-                admin: initProfiles[1].admin,
-                college: initProfiles[1].college,
-                review: initProfiles[1].review,
+                id: deleteResponse.body.id,
+                name: initialProfiles[1].name,
+                lastname: initialProfiles[1].lastname,
+                birthday: initialProfiles[1].birthday,
+                picture: initialProfiles[1].picture,
+                admin: initialProfiles[1].admin,
+                college: initialProfiles[1].college,
+                review: initialProfiles[1].review,
                 user: {
-                    id: initUsers[1].id,
-                    email: initUsers[1].email
+                    id: deleteResponse.body.user.id,
+                    email: initialUsers[1].email
                 }
             };
             expect(deleteResponse.body).toEqual(expectedBody);
@@ -375,7 +372,7 @@ describe('profile endpoints', () => {
 
         test('failed to delete the profile because the token is expired', async () => {
             const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const deleteResponse = await after1s(apiDeleteWithAuth,endpointUrl, token);  // token expires after 1 second
+            const deleteResponse = await after1s(apiDeleteWithAuth, endpointUrl, token);  // token expires after 1 second
             expectUnauthorizedResponse(deleteResponse);
             expectTokenExpiredErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
@@ -391,17 +388,17 @@ describe('profile endpoints', () => {
             expectSuccessfulRequestResponse(getResponse);
 
             const expectedBody = {
-                id: initProfiles[1].id,
-                name: initProfiles[1].name,
-                lastname: initProfiles[1].lastname,
-                birthday: initProfiles[1].birthday,
-                picture: initProfiles[1].picture,
-                admin: initProfiles[1].admin,
-                college: initProfiles[1].college,
-                review: initProfiles[1].review,
+                id: getResponse.body.id,
+                name: initialProfiles[1].name,
+                lastname: initialProfiles[1].lastname,
+                birthday: initialProfiles[1].birthday,
+                picture: initialProfiles[1].picture,
+                admin: initialProfiles[1].admin,
+                college: initialProfiles[1].college,
+                review: initialProfiles[1].review,
                 user: {
-                    id: initUsers[1].id,
-                    email: initUsers[1].email
+                    id: getResponse.body.user.id,
+                    email: initialUsers[1].email
                 }
             };
             expect(getResponse.body).toEqual(expectedBody);
@@ -443,7 +440,7 @@ describe('profile endpoints', () => {
 
         test('failed to return the profile because the token is expired', async () => {
             const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const getResponse = await after1s(apiGetWithAuth,endpointUrl, token); // token expires after 1 second
+            const getResponse = await after1s(apiGetWithAuth, endpointUrl, token); // token expires after 1 second
             expectUnauthorizedResponse(getResponse);
             expectTokenExpiredErrorMessageReceived(getResponse);
         });
@@ -456,24 +453,12 @@ describe('profile endpoints', () => {
             const token = (await apiLoginUser(initialUsers[0])).body.token;
             const getResponse = await apiGetWithAuth(endpointUrl, token);
             expectSuccessfulRequestResponse(getResponse);
-            let i = 0;
-            const expectedBody = initProfiles.map(profile => {
-                return {
-                    id: profile.id,
-                    name: profile.name,
-                    lastname: profile.lastname,
-                    birthday: profile.birthday,
-                    picture: profile.picture,
-                    admin: profile.admin,
-                    college: profile.college,
-                    review: profile.review,
+            await expectSameArrayBody(getResponse.body, initialProfiles.map(profile => {
+                return { ...profile,
                     user: {
                         id: profile.userId,
-                        email: initUsers[i++].email
-                    }
-                };
-            });
-            expect(getResponse.body).toEqual(expectedBody);
+                        replaceWithFunc: async () => { return { name: "email", value: (await User.findOne({ where: { id: userId } })).email }}
+            }}}), compareProfileFunc);
         });
 
         test('failed to return all profiles because the profile is not an admin', async () => {
@@ -520,7 +505,7 @@ describe('profile endpoints', () => {
 
         test('failed to return all profiles because the token is expired', async () => {
             const token = (await apiLoginTestUser(initialUsers[0])).body.token;
-            const getResponse = await after1s(apiGetWithAuth,endpointUrl, token); // token expires after 1 second
+            const getResponse = await after1s(apiGetWithAuth, endpointUrl, token); // token expires after 1 second
             expectUnauthorizedResponse(getResponse);
             expectTokenExpiredErrorMessageReceived(getResponse);
         });

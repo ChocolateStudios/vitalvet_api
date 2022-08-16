@@ -2,6 +2,7 @@ import supertest from "supertest";
 import { app } from "../index.js";
 import { jest } from '@jest/globals';
 import { User } from "../models/User.js";
+import { Species } from "../models/Species.js";
 
 jest.setTimeout(60000); // 60 seconds
 export const api = supertest(app);
@@ -110,7 +111,7 @@ export const expectLengthOfDatabaseInstancesToBeTheSameWith = async (Model, leng
 export const expectOnlyInitialInstancesInDatabase = async (Model, initialInstances, compareFunc) => {
     let instancesInDatabase = await Model.findAll();
     expect(instancesInDatabase.length).toBe(initialInstances.length);
-    
+
     for (let initialInstance of initialInstances) {
         let isInitialInstance = false;
         for (let instanceInDatabase of instancesInDatabase) {
@@ -124,6 +125,25 @@ export const expectOnlyInitialInstancesInDatabase = async (Model, initialInstanc
         expect(isInitialInstance).toBe(true);
     }
 };
+
+export const expectSameArrayBody = async (bodyArray, expectedArray, compareFunc) => {
+    let _bodyArray = bodyArray.map(element => { return { ...element } });
+    let _expectedArray = expectedArray.map(element => { return { ...element } });
+    await detectInitialInstancesChanges(_expectedArray);
+
+    for (let bodyElement of _bodyArray) {
+        let isInitialInstance = false;
+        for (let initialInstance of _expectedArray) {
+            const condition = await compareFunc(bodyElement, initialInstance);
+            if (condition) {
+                isInitialInstance = true;
+                _bodyArray.splice(_bodyArray.indexOf(bodyElement), 1);
+                break;
+            }
+        }
+        expect(isInitialInstance).toBe(true);
+    }
+}
 
 
 
@@ -238,35 +258,37 @@ export const initialProfiles = [
     }
 ]
 
-// export const initialProfiles = [
-//     {
-//         name: 'Primer',
-//         lastname: 'Ejemplo',
-//         birthday: "1987-06-24",
-//         picture: 'http://www.example.com/image.png',
-//         admin: true,
-//         college: 'Universidad Nacional de Colombia',
-//         review: 'Lorem ipsum dolor sit amet, consectetur',
-//         userId: 1
-//     },
-//     {
-//         name: 'Segundo',
-//         lastname: 'Ejemplo',
-//         birthday: "2002-04-15",
-//         picture: 'http://www.example.com/image.png',
-//         admin: false,
-//         college: 'Universidad Nacional de Peru',
-//         review: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
-//         userId: 2
-//     }
-// ]
-
 export const initialSpecies = [
-    { name: "Perro" }, { name: "Gato" }
+    { name: "Gato" }, { name: "Perro" }
 ]
+
 export const initialSubspecies = [
-    { name: "Bulldog" }, { name: "Pastor alemán" }, // dog subspecies
-    { name: "Bengala" }, { name: "Ragdoll" }        // cat subspecies
+    { 
+        name: "Bulldog",
+        replaceWithFunc: async () => {
+            const species = await Species.findOne({ where: { name: 'Perro' } });
+            return { name: "speciesId", value: species.id };
+        }
+    },
+    { 
+        name: "Pastor alemán",
+        replaceWithFunc: async () => {
+            const species = await Species.findOne({ where: { name: 'Perro' } });
+            return { name: "speciesId", value: species.id };
+        }
+    },
+]
+
+export const initialOwners = [
+    { 
+        name: "Hugo",
+        lastname: "Parker",
+        birthday: "2020-01-01",
+        direction: "Av. Example 123 - Bogota",
+        phone: 999544555,
+        dni: 760987654,
+        email: "hugo@example.com"
+    },
 ]
 
 
@@ -279,17 +301,13 @@ export const initialSubspecies = [
 
 const detectInitialInstancesChanges = async (initialInstances) => {
     for (let initialInstance of initialInstances) {
-        let notContainsFunc = true;
         for (const propertyOfInstance in initialInstance) {
             if (propertyOfInstance.includes('replaceWithFunc')) {
                 const { name, value } = await initialInstance[propertyOfInstance]();
                 delete initialInstance[propertyOfInstance];
                 initialInstance[name] = value;
-                notContainsFunc = false;
             }
         }
-        if (notContainsFunc)
-            return;
     }
 };
 
@@ -348,6 +366,28 @@ export const compareProfileFunc = async (profileInDatabase, initialProfile) => {
     const sameName = profileInDatabase.name === initialProfile.name;
     const sameLastname = profileInDatabase.lastname === initialProfile.lastname;
     return sameName && sameLastname;
+};
+
+export const compareSpeciesFunc = async (speciesInDatabase, initialSpecies) => {
+    const sameName = speciesInDatabase.name === initialSpecies.name;
+    return sameName;
+};
+
+export const compareSpeciesWithSubspeciesFunc = async (speciesInDatabase, initialSpecies) => {
+    const sameName = speciesInDatabase.name === initialSpecies.name;
+    let sameSubspecies = false;
+    for (let subspecies of speciesInDatabase.subspecies) {
+        for (let initialSubspecies of initialSpecies.subspecies) {
+            if (subspecies.name === initialSubspecies.name) {
+                sameSubspecies = true;
+                break;
+            }
+        }
+        if (!sameSubspecies) {
+            return false;
+        }
+    }
+    return sameName;
 };
 
 
