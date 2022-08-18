@@ -22,6 +22,7 @@ export const bodyPatientValidator = [
         .isDate()
         .withMessage('Birthday must be a date'),
     body('dayOfDeath')
+        .if(body('dayOfDeath').exists())
         .trim()
         .notEmpty()
         .withMessage('Day of death is required')

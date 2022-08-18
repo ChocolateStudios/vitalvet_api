@@ -3,6 +3,8 @@ import { app } from "../index.js";
 import { jest } from '@jest/globals';
 import { User } from "../models/User.js";
 import { Species } from "../models/Species.js";
+import { Owner } from "../models/Owner.js";
+import { Profile } from "../models/Profile.js";
 
 jest.setTimeout(60000); // 60 seconds
 export const api = supertest(app);
@@ -300,6 +302,47 @@ export const initialOwners = [
     },
 ]
 
+export const initialPatients = [
+    { 
+        name: "Pepe",
+        weight: 40,
+        birthday: "2020-01-01",
+        dayOfDeath: "2022-04-15",
+        mainPicture: "https://www.example.com/image.png",
+        replaceWithFuncSubspeciesId: async () => {
+            const species = await Species.findOne({ where: { name: 'Bulldog' } });
+            return { name: "subspeciesId", value: species.id };
+        },
+        replaceWithFuncOwnerId: async () => {
+            const owner = await Owner.findOne({ where: { name: 'Hugo' } });
+            return { name: "ownerId", value: owner.id };
+        },
+        replaceWithFuncProfileId: async () => {
+            const profile = await Profile.findOne({ where: { name: 'Primer' } });
+            return { name: "profileId", value: profile.id };
+        }
+    },
+    { 
+        name: "Tito",
+        weight: 67.8,
+        birthday: "2019-08-14",
+        dayOfDeath: "2021-11-19",
+        mainPicture: "https://www.example2.com/image2.png",
+        replaceWithFuncSubspeciesId: async () => {
+            const species = await Species.findOne({ where: { name: 'Bulldog' } });
+            return { name: "subspeciesId", value: species.id };
+        },
+        replaceWithFuncOwnerId: async () => {
+            const owner = await Owner.findOne({ where: { name: 'Jorge' } });
+            return { name: "ownerId", value: owner.id };
+        },
+        replaceWithFuncProfileId: async () => {
+            const profile = await Profile.findOne({ where: { name: 'Segundo' } });
+            return { name: "profileId", value: profile.id };
+        }
+    },
+]
+
 
 
 
@@ -405,6 +448,13 @@ export const compareOwnerFunc = async (ownerInDatabase, initialOwner) => {
     const sameDirection = ownerInDatabase.direction === initialOwner.direction;
     const sameEmail = ownerInDatabase.email === initialOwner.email;
     return sameName && sameLastame && sameDirection && sameEmail;
+};
+
+export const comparePatientFunc = async (patientInDatabase, initialPatient) => {
+    const sameName = patientInDatabase.name === initialPatient.name;
+    const sameDayOfDeath = patientInDatabase.dayOfDeath === initialPatient.dayOfDeath;
+    const sameMainPicture = patientInDatabase.mainPicture === initialPatient.mainPicture;
+    return sameName && sameDayOfDeath && sameMainPicture;
 };
 
 

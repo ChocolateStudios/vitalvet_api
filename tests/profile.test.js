@@ -288,7 +288,7 @@ describe('profile endpoints', () => {
             expectBadRequiredBodyAttribute(updateResponse, "Review is required");
         });
 
-        test('failed to update a profile because the data types of name, lastname, birthday, picture, college and review are incorrect', async () => {
+        test('failed to update the profile because the data types of name, lastname, birthday, picture, college and review are incorrect', async () => {
             const token = (await apiLoginUser(initialUsers[1])).body.token;
 
             const newProfile = {

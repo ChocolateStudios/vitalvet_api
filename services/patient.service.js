@@ -29,6 +29,9 @@ export class PatientService {
             
         await patient.save();
 
+        patient.dayOfDeath ? patient.dayOfDeath = patient.dayOfDeath : patient.dayOfDeath = null;
+        patient.mainPicture ? patient.mainPicture = patient.mainPicture : patient.mainPicture = null;
+
         return patient;
     }
     
