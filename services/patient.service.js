@@ -41,21 +41,24 @@ export class PatientService {
         if (!patient)
             throw customException(404, "Patient not found");
             
-        const { name, weight, birthday, dayOfDeath, mainPicture, speciesId, ownerId } = body;
+        const { name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId } = body;
 
-        const species = await Species.findOne({ where: { id: speciesId } });
+        const species = await SpeciesRepository.getSubspeciesById(subspeciesId);
 
         if (!species)
-            throw customException(404, "Species not found");
+            throw customException(404, "Subspecies not found");
 
         const owner = await Owner.findOne({ where: { id: ownerId } });
 
         if (!owner)
             throw customException(404, "Owner not found");
 
-        patient.set({ name, weight, birthday, dayOfDeath, mainPicture, speciesId, ownerId });
+        patient.set({ name, weight, birthday, dayOfDeath, mainPicture, subspeciesId, ownerId });
 
         await patient.save();
+
+        patient.dayOfDeath ? patient.dayOfDeath = patient.dayOfDeath : patient.dayOfDeath = null;
+        patient.mainPicture ? patient.mainPicture = patient.mainPicture : patient.mainPicture = null;
 
         return patient;
     }

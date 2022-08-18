@@ -108,7 +108,7 @@ Patient.hasMany(DocumentFile, {
     foreignKey: { name: "patientId", allowNull: true },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
 });
-DocumentFile.hasMany(Patient, {
+DocumentFile.belongsTo(Patient, {
     foreignKey: { name: "patientId", allowNull: true },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patient"
 });
@@ -118,7 +118,7 @@ MedicalAttention.hasMany(DocumentFile, {
     foreignKey: { name: "medicalAttentionId", allowNull: true },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
 });
-DocumentFile.hasMany(MedicalAttention, {
+DocumentFile.belongsTo(MedicalAttention, {
     foreignKey: { name: "medicalAttentionId", allowNull: true },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttention"
 });
