@@ -12,10 +12,10 @@ export class AuthService {
         const user = User.build({ email, password });
         await user.save();
 
-        const { token, expiresIn } = generateToken(user.id);
-        generateRefreshToken(user.id, res);
+        const { accessToken, expiresIn } = generateToken(user.id);
+        const refreshToken = generateRefreshToken(user.id, res);
 
-        return { token, expiresIn };
+        return { accessToken, expiresIn, refreshToken };
     }
 
     static async login (email, password, res) {
@@ -29,10 +29,10 @@ export class AuthService {
         if (!passwordCompareResult)
             throw new customException(404, "Invalid email or password");
 
-        const { token, expiresIn } = generateToken(user.id);
-        generateRefreshToken(user.id, res);
+        const { accessToken, expiresIn } = generateToken(user.id);
+        const refreshToken = generateRefreshToken(user.id, res);
 
-        return { token, expiresIn };
+        return { accessToken, expiresIn, refreshToken };
     };
 
     static async testingLogin (email, password, res) {
@@ -46,10 +46,10 @@ export class AuthService {
         if (!passwordCompareResult)
             throw new customException(404, "Invalid email or password");
 
-        const { token, expiresIn } = generateTestToken(user.id);
-        generateRefreshToken(user.id, res);
+        const { accessToken, expiresIn } = generateTestToken(user.id);
+        const refreshToken = generateRefreshToken(user.id, res);
 
-        return { token, expiresIn };
+        return { accessToken, expiresIn, refreshToken };
     };
 
     static async deleteAccount (id) {
@@ -63,9 +63,13 @@ export class AuthService {
         return true;
     };
 
-    static refreshToken (uid) {
-        const { token, expiresIn } = generateToken(uid);
-        
+    static async refreshToken (id) {
+        const user = await User.findOne({ where: { id } });
+
+        if (!user)
+            throw new customException(404, "Invalid user");
+
+        const { token, expiresIn } = generateToken(id);
         return { token, expiresIn };
     };
 

@@ -10,16 +10,34 @@
  *      TokenResponse:
  *        type: object
  *        properties:
- *         token:
+ *         accessToken:
  *          type: string
  *         expiresIn:
  *          type: integer
  *        required:
- *          - token
+ *          - accessToken
  *          - expiresIn
  *        example:
- *          token: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
+ *          accessToken: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
  *          expiresIn: 900
+ * 
+ *      TokenWithRefreshResponse:
+ *        type: object
+ *        properties:
+ *         accessToken:
+ *          type: string
+ *         expiresIn:
+ *          type: integer
+ *         refreshToken:
+ *          type: string
+ *        required:
+ *          - accessToken
+ *          - expiresIn
+ *          - refreshToken
+ *        example:
+ *          accessToken: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
+ *          expiresIn: 900
+ *          refreshToken: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
  * 
  *      UnauthorizedResponse:
  *        type: object

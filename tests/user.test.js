@@ -22,7 +22,8 @@ describe('user enpoints', () => {
             const createResponse = await apiPost(endpointUrl, newUser);
             expectSuccessfulCreation(createResponse);
             expect(createResponse.body.expiresIn).toBe(900);
-            expect(createResponse.body.token.length).toBeGreaterThan(0);
+            expect(createResponse.body.accessToken.length).toBeGreaterThan(0);
+            expect(createResponse.body.refreshToken.length).toBeGreaterThan(0);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length + 1);
         });
 
@@ -64,9 +65,10 @@ describe('user enpoints', () => {
 
         test('user logged in successfully', async () => {
             const createResponse = await apiPost(endpointUrl, initialUsers[1]);
-            expectSuccessfulRequestResponse(createResponse);
+            expectSuccessfulRequestResponse(createResponse);            
             expect(createResponse.body.expiresIn).toBe(900);
-            expect(createResponse.body.token.length).toBeGreaterThan(0);
+            expect(createResponse.body.accessToken.length).toBeGreaterThan(0);
+            expect(createResponse.body.refreshToken.length).toBeGreaterThan(0);
         });
 
         test('failed to login the user because there is no user with the email', async () => {
@@ -97,8 +99,8 @@ describe('user enpoints', () => {
         const endpointUrl = '/auth';
 
         test('user deleted successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
             const expectedBody = { message: 'Account deleted' };
             expect(deleteResponse.body).toEqual(expectedBody);
@@ -106,25 +108,25 @@ describe('user enpoints', () => {
         });
 
         test('failed to delete a user because the user does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, token);
+            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(deleteResponse2);
             const expectedBody = { message: 'Invalid user' };
             expect(deleteResponse2.body).toEqual(expectedBody);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length - 1);
         });
 
-        test('failed to delete a user because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+        test('failed to delete a user because the access token is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectUnauthorizedResponse(deleteResponse);
             expectTokenErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
-        test('failed to delete a user because there is no token', async () => {
+        test('failed to delete a user because there is no access token', async () => {
             const deleteResponse = await apiDelete(endpointUrl);
             expectUnauthorizedResponse(deleteResponse);
             const expectedBody = { message: 'Not authorized' };
@@ -132,26 +134,30 @@ describe('user enpoints', () => {
             await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
 
-        test('failed to delete a user because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const deleteResponse = await after1s(apiDeleteWithAuth,endpointUrl, token);  // token expires after 1 second
+        test('failed to delete a user because the access token is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await after1s(apiDeleteWithAuth,endpointUrl, accessToken);  // access token expires after 1 second
             expectUnauthorizedResponse(deleteResponse);
             expectTokenExpiredErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(User, initialUsers.length);
         });
     });
 
-    describe.skip('refresh a token', () => {
+    describe.skip('refresh an access token', () => {
         test('token refreshed successfully', async () => {
-            expect(true).toBe(true);
+            const getResponse = await apiGet(endpointUrl, initialUsers[1]);
+            expectSuccessfulRequestResponse(getResponse);            
+            expect(getResponse.body.expiresIn).toBe(900);
+            expect(getResponse.body.accessToken.length).toBeGreaterThan(0);
+            expect(getResponse.body.refreshToken.length).toBeGreaterThan(0);
         });
     });
 
-    describe.skip('logout a user', () => {
-        test('user logged out successfully', async () => {
-            expect(true).toBe(true);
-        });
-    });
+    // describe.skip('logout a user', () => {
+    //     test('user logged out successfully', async () => {
+    //         expect(true).toBe(true);
+    //     });
+    // });
 });
 
 

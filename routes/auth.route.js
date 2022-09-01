@@ -26,7 +26,7 @@ const router = Router();
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/TokenResponse'
+ *                          $ref: '#/components/schemas/TokenWithRefreshResponse'
  */
 router.post('/register', bodyRegisterValidator, register);
 
@@ -52,7 +52,7 @@ router.post('/register', bodyRegisterValidator, register);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/TokenResponse'
+ *                          $ref: '#/components/schemas/TokenWithRefreshResponse'
  */
 router.post('/login', bodyLoginValidator, login);
 
@@ -78,7 +78,7 @@ router.post('/login', bodyLoginValidator, login);
  *                  application/json:
  *                      schema:
  *                          type: object
- *                          $ref: '#/components/schemas/TokenResponse'
+ *                          $ref: '#/components/schemas/TokenWithRefreshResponse'
  */
 router.post('/login/test', bodyLoginValidator, testingLogin);
 
@@ -127,7 +127,7 @@ router.get('/refresh', requireRefreshToken, refreshToken);
 
 
 /**
- * @swagger
+ * swagger
  * /api/v1/auth/logout:
  *  get:
  *      summary: Logout the logged in user
@@ -143,6 +143,6 @@ router.get('/refresh', requireRefreshToken, refreshToken);
  *                              message: "Logout successfully"
  * 
  */
-router.get('/logout', logout);
+// router.get('/logout', logout);
 
 export default router;

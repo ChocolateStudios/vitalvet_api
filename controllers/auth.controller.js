@@ -44,10 +44,10 @@ export const deleteAccount = async (req, res) => {
     }
 }
 
-export const refreshToken = (req, res) => {
+export const refreshToken = async (req, res) => {
 
     try {
-        const tokenResponse = AuthService.refreshToken(req.uid);
+        const tokenResponse = await AuthService.refreshToken(req.uid);
         return res.status(200).json(tokenResponse);
     } catch (error) {
         const { code, message } = exceptionResponse(error);
