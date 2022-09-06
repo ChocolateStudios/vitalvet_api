@@ -5,6 +5,8 @@ import { User } from "../models/User.js";
 import { Species } from "../models/Species.js";
 import { Owner } from "../models/Owner.js";
 import { Profile } from "../models/Profile.js";
+import { Patient } from "../models/Patient.js";
+import { EventType } from "../models/EventType.js";
 
 jest.setTimeout(60000); // 60 seconds
 export const api = supertest(app);
@@ -352,6 +354,45 @@ export const initialMedicines = [
     { name: "Apronax" }, { name: "Boombap" },
 ]
 
+export const initialEvents = [
+    { 
+        title: "Bañar a Pepe",
+        description: "Shampoo de Limon",
+        startTime: "2019-03-17T00:00:00.000Z",
+        endTime: "2019-03-17T01:02:00.000Z",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Pepe' } });
+            return { name: "patientId", value: patient.id };
+        },
+        replaceWithFuncEventTypeId: async () => {
+            const eventType = await EventType.findOne({ where: { name: 'Baños' } });
+            return { name: "eventTypeId", value: eventType.id };
+        },
+        replaceWithFuncProfileId: async () => {
+            const profile = await Profile.findOne({ where: { name: 'Primer' } });
+            return { name: "profileId", value: profile.id };
+        }
+    },
+    { 
+        title: "Vacunar a Tito",
+        description: "Vacuna de covid",
+        startTime: "2019-05-25T00:09:00.000Z",
+        endTime: "2019-05-25T01:10:00.000Z",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Tito' } });
+            return { name: "patientId", value: patient.id };
+        },
+        replaceWithFuncEventTypeId: async () => {
+            const eventType = await EventType.findOne({ where: { name: 'Vacunas' } });
+            return { name: "eventTypeId", value: eventType.id };
+        },
+        replaceWithFuncProfileId: async () => {
+            const profile = await Profile.findOne({ where: { name: 'Segundo' } });
+            return { name: "profileId", value: profile.id };
+        }
+    },
+]
+
 
 
 
@@ -475,6 +516,12 @@ export const compareEventTypeFunc = async (eventTypeInDatabase, initialEventType
 export const compareMedicineFunc = async (medicineInDatabase, initialMedicine) => {
     const sameName = medicineInDatabase.name === initialMedicine.name;
     return sameName;
+};
+
+export const compareEventFunc = async (eventInDatabase, initialEvent) => {
+    const sameTitle = eventInDatabase.title === initialEvent.title;
+    const sameDescription = eventInDatabase.description === initialEvent.description;
+    return sameTitle && sameDescription;
 };
 
 
