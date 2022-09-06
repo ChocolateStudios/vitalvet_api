@@ -1,7 +1,7 @@
 import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { Species } from '../models/Species.js';
-import { api, apiDelete, apiGet, apiPost, apiPut, compareSpeciesFunc, compareSpeciesWithSubspeciesFunc, ensureOnlyInitialInstancesExist, expectBadRequestResponse, expectBadRequiredBodyAttribute, expectLengthOfDatabaseInstancesToBeTheSameWith, expectNotFoundResponse, expectOnlyInitialInstancesInDatabase, expectSameArrayBody, expectSuccessfulCreation, expectSuccessfulRequestResponse, initialSpecies, initialSubspecies } from './testCommon.js';
+import { apiDelete, apiGet, apiPost, apiPut, compareSpeciesFunc, compareSpeciesWithSubspeciesFunc, ensureOnlyInitialInstancesExist, expectBadRequestResponse, expectBadRequiredBodyAttribute, expectLengthOfDatabaseInstancesToBeTheSameWith, expectNotFoundResponse, expectOnlyInitialInstancesInDatabase, expectSameArrayBody, expectSuccessfulCreation, expectSuccessfulRequestResponse, initialSpecies, initialSubspecies } from './testCommon.js';
 
 const initialSpeciesAndSubspecies = initialSpecies.concat(initialSubspecies);
 let initSpecies = [];

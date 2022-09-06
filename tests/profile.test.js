@@ -2,7 +2,7 @@ import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { Profile } from '../models/Profile.js';
 import { User } from '../models/User.js';
-import { api, initialUsers, initialProfiles, expectSuccessfulCreation, expectBadRequestResponse, expectUnauthorizedResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectBadRequiredBodyAttribute, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, apiLoginUser, apiGetWithAuth, apiLoginTestUser, after1s, apiGet, apiDeleteWithAuth, apiDelete, apiPut, apiPutWithAuth, apiPost, apiRegisterUser, apiPostWithAuth, expectLengthOfDatabaseInstancesToBeTheSameWith, expectUnauthorizedActionResponse, ensureOnlyInitialInstancesExist, compareUserFunc, compareProfileFunc, expectOnlyInitialInstancesInDatabase, expectSameArrayBody } from './testCommon.js';
+import { initialUsers, initialProfiles, expectSuccessfulCreation, expectBadRequestResponse, expectUnauthorizedResponse, expectSuccessfulRequestResponse, expectNotFoundResponse, expectBadRequiredBodyAttribute, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, apiLoginUser, apiGetWithAuth, apiLoginTestUser, after1s, apiGet, apiDeleteWithAuth, apiDelete, apiPut, apiPutWithAuth, apiPost, apiRegisterUser, apiPostWithAuth, expectLengthOfDatabaseInstancesToBeTheSameWith, expectUnauthorizedActionResponse, ensureOnlyInitialInstancesExist, compareUserFunc, compareProfileFunc, expectOnlyInitialInstancesInDatabase, expectSameArrayBody } from './testCommon.js';
 
 describe('profile endpoints', () => {
     beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('profile endpoints', () => {
 
         test('profile created successfully', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-            const token = (await apiRegisterUser(newUser)).body.token;
+            const accessToken = (await apiRegisterUser(newUser)).body.accessToken;
             const newProfile = {
                 name: 'Nuevo',
                 lastname: 'Ejemplo',
@@ -34,7 +34,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newProfile);
             expectSuccessfulCreation(createResponse);
             const expectedBody = {
                 id: createResponse.body.id,
@@ -56,7 +56,7 @@ describe('profile endpoints', () => {
 
         test('profile created successfully with no picture', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-            const token = (await apiRegisterUser(newUser)).body.token;
+            const accessToken = (await apiRegisterUser(newUser)).body.accessToken;
             const newProfile = {
                 name: 'Nuevo',
                 lastname: 'Ejemplo',
@@ -64,7 +64,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newProfile);
             expectSuccessfulCreation(createResponse);
             const expectedBody = {
                 id: createResponse.body.id,
@@ -85,7 +85,7 @@ describe('profile endpoints', () => {
         });
 
         test('failed to create a profile because a profile already exists for this user', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newProfile = {
                 name: 'Nuevo',
                 lastname: 'Ejemplo',
@@ -93,7 +93,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newProfile);
             expectBadRequestResponse(createResponse);
             const expectedBody = { message: 'Profile already exists for this user' };
             expect(createResponse.body).toEqual(expectedBody);
@@ -101,8 +101,8 @@ describe('profile endpoints', () => {
         });
 
         test('failed to create a profile because the user does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/auth', token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/auth', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
             const newProfile = {
                 name: 'Nuevo',
@@ -111,7 +111,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newProfile);
             expectNotFoundResponse(createResponse);
             const expectedBody = { message: 'Invalid user' };
             expect(createResponse.body).toEqual(expectedBody);
@@ -136,9 +136,9 @@ describe('profile endpoints', () => {
 
         test('failed to create a profile because there is no name, lastname, birthday, college and review', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-            const token = (await apiRegisterUser(newUser)).body.token;
+            const accessToken = (await apiRegisterUser(newUser)).body.accessToken;
             const newProfile = { picture: 'http://www.example.com/image.png' };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newProfile);
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Name is required");
             expectBadRequiredBodyAttribute(createResponse, "Lastname is required");
@@ -150,7 +150,7 @@ describe('profile endpoints', () => {
 
         test('failed to create a profile because the data types of name, lastname, birthday, picture, college and review are incorrect', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-            const token = (await apiRegisterUser(newUser)).body.token;
+            const accessToken = (await apiRegisterUser(newUser)).body.accessToken;
             const newProfile = {
                 name: false,
                 lastname: false,
@@ -159,7 +159,7 @@ describe('profile endpoints', () => {
                 college: false,
                 review: false
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newProfile);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newProfile);
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Birthday must be a date");
             expectBadRequiredBodyAttribute(createResponse, "Picture must be a url");
@@ -171,7 +171,7 @@ describe('profile endpoints', () => {
         const endpointUrl = '/profiles';
 
         test('profile updated successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newProfile = {
                 name: 'Ejemplo',
                 lastname: 'Actualizado',
@@ -180,7 +180,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
+            const updateResponse = await apiPutWithAuth(endpointUrl, accessToken, newProfile);
             expectSuccessfulRequestResponse(updateResponse);
             const expectedBody = {
                 id: updateResponse.body.id,
@@ -200,7 +200,7 @@ describe('profile endpoints', () => {
         });
 
         test('profile updated successfully with no picture', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newProfile = {
                 name: 'Ejemplo',
                 lastname: 'Actualizado',
@@ -208,7 +208,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
+            const updateResponse = await apiPutWithAuth(endpointUrl, accessToken, newProfile);
             expectSuccessfulRequestResponse(updateResponse);
             const expectedBody = {
                 id: updateResponse.body.id,
@@ -229,7 +229,7 @@ describe('profile endpoints', () => {
 
         test('failed to update the profile because the profile does not exist', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-            const token = (await apiRegisterUser(newUser)).body.token;
+            const accessToken = (await apiRegisterUser(newUser)).body.accessToken;
             const newProfile = {
                 name: 'Nuevo',
                 lastname: 'Ejemplo',
@@ -237,15 +237,15 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
+            const updateResponse = await apiPutWithAuth(endpointUrl, accessToken, newProfile);
             expectNotFoundResponse(updateResponse);
             const expectedBody = { message: 'Profile not found for this user' };
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
         test('failed to update the profile because the user does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/auth', token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/auth', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
 
             const newProfile = {
@@ -255,7 +255,7 @@ describe('profile endpoints', () => {
                 college: 'Universidad Nacional de Canada',
                 review: 'Lorem ipsum dolor sit amet, consectetur adipiscing'
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
+            const updateResponse = await apiPutWithAuth(endpointUrl, accessToken, newProfile);
             expectNotFoundResponse(updateResponse);
             const expectedBody = { message: 'Invalid user' };
             expect(updateResponse.body).toEqual(expectedBody);
@@ -277,9 +277,9 @@ describe('profile endpoints', () => {
         });
 
         test('failed to update the profile because there is no name, lastname, birthday, college and review', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newProfile = { picture: 'http://www.example.com/image.png' };
-            const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
+            const updateResponse = await apiPutWithAuth(endpointUrl, accessToken, newProfile);
             expectBadRequestResponse(updateResponse);
             expectBadRequiredBodyAttribute(updateResponse, "Name is required");
             expectBadRequiredBodyAttribute(updateResponse, "Lastname is required");
@@ -289,7 +289,7 @@ describe('profile endpoints', () => {
         });
 
         test('failed to update the profile because the data types of name, lastname, birthday, picture, college and review are incorrect', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
 
             const newProfile = {
                 name: false,
@@ -299,7 +299,7 @@ describe('profile endpoints', () => {
                 college: false,
                 review: false
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl, token, newProfile);
+            const updateResponse = await apiPutWithAuth(endpointUrl, accessToken, newProfile);
             expectBadRequestResponse(updateResponse);
             expectBadRequiredBodyAttribute(updateResponse, "Birthday must be a date");
             expectBadRequiredBodyAttribute(updateResponse, "Picture must be a url");
@@ -310,8 +310,8 @@ describe('profile endpoints', () => {
         const endpointUrl = '/profiles';
 
         test('profile deleted successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
 
             const expectedBody = {
@@ -333,10 +333,10 @@ describe('profile endpoints', () => {
         });
 
         test('failed to delete the profile because the profile does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, token);
+            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(deleteResponse2);
             const expectedBody = { message: 'Profile not found for this user' };
             expect(deleteResponse2.body).toEqual(expectedBody);
@@ -344,25 +344,25 @@ describe('profile endpoints', () => {
         });
 
         test('failed to delete the profile because the user does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/auth', token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/auth', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, token);
+            const deleteResponse2 = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(deleteResponse2);
             const expectedBody = { message: 'Invalid user' };
             expect(deleteResponse2.body).toEqual(expectedBody);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length - 1);
         });
 
-        test('failed to delete the profile because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl, token);
+        test('failed to delete the profile because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl, accessToken);
             expectUnauthorizedResponse(deleteResponse);
             expectTokenErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
-        test('failed to delete the profile because there is no token', async () => {
+        test('failed to delete the profile because there is no accessToken', async () => {
             const deleteResponse = await apiDelete(endpointUrl);
             expectUnauthorizedResponse(deleteResponse);
             const expectedBody = { message: 'Not authorized' };
@@ -370,9 +370,9 @@ describe('profile endpoints', () => {
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
-        test('failed to delete the profile because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const deleteResponse = await after1s(apiDeleteWithAuth, endpointUrl, token);  // token expires after 1 second
+        test('failed to delete the profile because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await after1s(apiDeleteWithAuth, endpointUrl, accessToken);  // accessToken expires after 1 second
             expectUnauthorizedResponse(deleteResponse);
             expectTokenExpiredErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
@@ -383,8 +383,8 @@ describe('profile endpoints', () => {
         const endpointUrl = '/profiles';
 
         test('profile returned successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(getResponse);
 
             const expectedBody = {
@@ -405,42 +405,42 @@ describe('profile endpoints', () => {
         });
 
         test('failed to return the profile because the profile does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/profiles', token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/profiles', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(getResponse);
             const expectedBody = { message: 'Profile not found for this user' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
         test('failed to return the profile because the user does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/auth', token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/auth', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(getResponse);
             const expectedBody = { message: 'Invalid user' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return the profile because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+        test('failed to return the profile because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectUnauthorizedResponse(getResponse);
             expectTokenErrorMessageReceived(getResponse);
         });
 
-        test('failed to return the profile because there is no token', async () => {
+        test('failed to return the profile because there is no accessToken', async () => {
             const getResponse = await apiGet(endpointUrl);
             expectUnauthorizedResponse(getResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return the profile because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const getResponse = await after1s(apiGetWithAuth, endpointUrl, token); // token expires after 1 second
+        test('failed to return the profile because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
+            const getResponse = await after1s(apiGetWithAuth, endpointUrl, accessToken); // accessToken expires after 1 second
             expectUnauthorizedResponse(getResponse);
             expectTokenExpiredErrorMessageReceived(getResponse);
         });
@@ -450,8 +450,8 @@ describe('profile endpoints', () => {
         const endpointUrl = '/profiles/all';
 
         test('all profiles returned successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[0])).body.token;
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[0])).body.accessToken;
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(getResponse);
             await expectSameArrayBody(getResponse.body, initialProfiles.map(profile => {
                 return { ...profile,
@@ -462,50 +462,50 @@ describe('profile endpoints', () => {
         });
 
         test('failed to return all profiles because the profile is not an admin', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectUnauthorizedActionResponse(getResponse);
             const expectedBody = { message: 'You are not authorized to do this action' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
         test('failed to return all profiles because the profile does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[0])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/profiles', token);
+            const accessToken = (await apiLoginUser(initialUsers[0])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/profiles', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(getResponse);
             const expectedBody = { message: 'Profile not found for this user' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
         test('failed to return all profiles because the user does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers[0])).body.token;
-            const deleteResponse = await apiDeleteWithAuth('/auth', token);
+            const accessToken = (await apiLoginUser(initialUsers[0])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth('/auth', accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectNotFoundResponse(getResponse);
             const expectedBody = { message: 'Invalid user' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return all profiles because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+        test('failed to return all profiles because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectUnauthorizedResponse(getResponse);
             expectTokenErrorMessageReceived(getResponse);
         });
 
-        test('failed to return all profiles because there is no token', async () => {
+        test('failed to return all profiles because there is no accessToken', async () => {
             const getResponse = await apiGet(endpointUrl);
             expectUnauthorizedResponse(getResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return all profiles because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[0])).body.token;
-            const getResponse = await after1s(apiGetWithAuth, endpointUrl, token); // token expires after 1 second
+        test('failed to return all profiles because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[0])).body.accessToken;
+            const getResponse = await after1s(apiGetWithAuth, endpointUrl, accessToken); // accessToken expires after 1 second
             expectUnauthorizedResponse(getResponse);
             expectTokenExpiredErrorMessageReceived(getResponse);
         });

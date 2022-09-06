@@ -5,7 +5,7 @@ import { Patient } from '../models/Patient.js';
 import { Profile } from '../models/Profile.js';
 import { Species } from '../models/Species.js';
 import { User } from '../models/User.js';
-import { after1s, api, apiDelete, apiDeleteWithAuth, apiGet, apiGetWithAuth, apiLoginTestUser, apiLoginUser, apiPost, apiPostWithAuth, apiPut, apiPutWithAuth, apiRegisterUser, compareOwnerFunc, comparePatientFunc, compareProfileFunc, compareSpeciesFunc, compareUserFunc, ensureOnlyInitialInstancesExist, expectBadRequestResponse, expectBadRequiredBodyAttribute, expectLengthOfDatabaseInstancesToBeTheSameWith, expectNotFoundResponse, expectOnlyInitialInstancesInDatabase, expectSameArrayBody, expectSuccessfulCreation, expectSuccessfulRequestResponse, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, expectUnauthorizedResponse, initialOwners, initialPatients, initialProfiles, initialSpecies, initialSubspecies, initialUsers } from './testCommon.js';
+import { after1s, apiDelete, apiDeleteWithAuth, apiGet, apiGetWithAuth, apiLoginTestUser, apiLoginUser, apiPost, apiPostWithAuth, apiPut, apiPutWithAuth, apiRegisterUser, compareOwnerFunc, comparePatientFunc, compareProfileFunc, compareSpeciesFunc, compareUserFunc, ensureOnlyInitialInstancesExist, expectBadRequestResponse, expectBadRequiredBodyAttribute, expectLengthOfDatabaseInstancesToBeTheSameWith, expectNotFoundResponse, expectOnlyInitialInstancesInDatabase, expectSameArrayBody, expectSuccessfulCreation, expectSuccessfulRequestResponse, expectTokenErrorMessageReceived, expectTokenExpiredErrorMessageReceived, expectUnauthorizedResponse, initialOwners, initialPatients, initialProfiles, initialSpecies, initialSubspecies, initialUsers } from './testCommon.js';
 
 const initialSpeciesAndSubspecies = initialSpecies.concat(initialSubspecies);
 
@@ -53,7 +53,7 @@ describe('patient endpoints', () => {
         const endpointUrl = '/patients';
 
         test('patient created successfully', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -63,7 +63,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectSuccessfulCreation(createResponse);
             const expectedBody = {
                 id: createResponse.body.id,
@@ -82,7 +82,7 @@ describe('patient endpoints', () => {
         });
 
         test('patient created successfully with no dayOfDeath, mainPicture', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -90,7 +90,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectSuccessfulCreation(createResponse);
             const expectedBody = {
                 id: createResponse.body.id,
@@ -109,7 +109,7 @@ describe('patient endpoints', () => {
         });
 
         test('failed to create a patient because the owner does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -117,7 +117,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: 999,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectNotFoundResponse(createResponse);
             const expectedBody = { message: 'Owner not found' };
             expect(createResponse.body).toEqual(expectedBody);
@@ -125,7 +125,7 @@ describe('patient endpoints', () => {
         });
 
         test('failed to create a patient because the subspecies does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -133,7 +133,7 @@ describe('patient endpoints', () => {
                 subspeciesId: 999,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectNotFoundResponse(createResponse);
             const expectedBody = { message: 'Subspecies not found' };
             expect(createResponse.body).toEqual(expectedBody);
@@ -142,7 +142,7 @@ describe('patient endpoints', () => {
 
         test('failed to create a patient because the profile does not exist', async () => {
             const newUser = { email: "newemail@example.com", password: "newPassword#123" };
-            const token = (await apiRegisterUser(newUser)).body.token;
+            const accessToken = (await apiRegisterUser(newUser)).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -150,7 +150,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectNotFoundResponse(createResponse);
             const expectedBody = { message: 'Profile not found for this user' };
             expect(createResponse.body).toEqual(expectedBody);
@@ -158,9 +158,9 @@ describe('patient endpoints', () => {
         });
 
         test('failed to create a patient because there is no name, weight and birthday', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newPatient = { dayOfDeath: "2022-06-21", mainPicture: "https://www.exampleSiu.com/image.png" };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Name is required");
             expectBadRequiredBodyAttribute(createResponse, "Weight is required");
@@ -169,7 +169,7 @@ describe('patient endpoints', () => {
         });
 
         test('failed to create a patient because the data types of name, weight, birthday, dayOfDeath and mainPicture are incorrect', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
 
             const newPatient = {
                 name: false,
@@ -180,7 +180,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectBadRequestResponse(createResponse);
             expectBadRequiredBodyAttribute(createResponse, "Weight must be a float number");
             expectBadRequiredBodyAttribute(createResponse, "Birthday must be a date");
@@ -189,7 +189,7 @@ describe('patient endpoints', () => {
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Patient, initialPatients.length);
         });
 
-        test('failed to create a patient because there is no token', async () => {
+        test('failed to create a patient because there is no accessToken', async () => {
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -204,8 +204,8 @@ describe('patient endpoints', () => {
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Patient, initialPatients.length);
         });
 
-        test('failed to create a patient because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+        test('failed to create a patient because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -213,14 +213,14 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await apiPostWithAuth(endpointUrl, token, newPatient);
+            const createResponse = await apiPostWithAuth(endpointUrl, accessToken, newPatient);
             expectUnauthorizedResponse(createResponse);
             expectTokenErrorMessageReceived(createResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
         });
 
-        test('failed to create a patient because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
+        test('failed to create a patient because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -228,7 +228,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const createResponse = await after1s(apiPostWithAuth, endpointUrl, token, newPatient);  // token expires after 1 second
+            const createResponse = await after1s(apiPostWithAuth, endpointUrl, accessToken, newPatient);  // accessToken expires after 1 second
             expectUnauthorizedResponse(createResponse);
             expectTokenExpiredErrorMessageReceived(createResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Profile, initialProfiles.length);
@@ -239,7 +239,7 @@ describe('patient endpoints', () => {
         const endpointUrl = (patientId) => `/patients/${patientId}`;
 
         test('patient updated successfully', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -249,7 +249,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectSuccessfulRequestResponse(updateResponse);
             const expectedBody = {
                 id: updateResponse.body.id,
@@ -260,14 +260,14 @@ describe('patient endpoints', () => {
                 mainPicture: newPatient.mainPicture,
                 subspeciesId: `${initSubspecies[1].id}`,
                 ownerId: `${initOwners[1].id}`,
-                profileId: initProfiles[1].id,
+                profileId: updateResponse.body.profileId,
                 createdAt: `${updateResponse.body.createdAt}`,
             };
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
         test('patient updated successfully with no dayOfDeath, mainPicture', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -275,7 +275,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectSuccessfulRequestResponse(updateResponse);
             const expectedBody = {
                 id: updateResponse.body.id,
@@ -286,14 +286,14 @@ describe('patient endpoints', () => {
                 mainPicture: null,
                 subspeciesId: `${initSubspecies[1].id}`,
                 ownerId: `${initOwners[1].id}`,
-                profileId: initProfiles[1].id,
+                profileId: updateResponse.body.profileId,
                 createdAt: `${updateResponse.body.createdAt}`,
             };
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
         test('failed to update a patient because the patient does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -301,14 +301,14 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: 999,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(999), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(999), accessToken, newPatient);
             expectNotFoundResponse(updateResponse);
             const expectedBody = { message: 'Patient not found' };
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
         test('failed to update a patient because the owner does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -316,14 +316,14 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: 999,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectNotFoundResponse(updateResponse);
             const expectedBody = { message: 'Owner not found' };
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
         test('failed to update a patient because the subspecies does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -331,16 +331,16 @@ describe('patient endpoints', () => {
                 subspeciesId: 999,
                 ownerId: initOwners[1].id,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectNotFoundResponse(updateResponse);
             const expectedBody = { message: 'Subspecies not found' };
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
         test('failed to update a patient because there is no name, weight and birthday', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newPatient = { dayOfDeath: "2022-06-21", mainPicture: "https://www.exampleSiu.com/image.png" };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectBadRequestResponse(updateResponse);
             expectBadRequiredBodyAttribute(updateResponse, "Name is required");
             expectBadRequiredBodyAttribute(updateResponse, "Weight is required");
@@ -348,7 +348,7 @@ describe('patient endpoints', () => {
         });
 
         test('failed to update a patient because the data types of name, weight, birthday, dayOfDeath and mainPicture are incorrect', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
             const newPatient = {
                 name: false,
                 weight: false,
@@ -358,7 +358,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectBadRequestResponse(updateResponse);
             expectBadRequiredBodyAttribute(updateResponse, "Weight must be a float number");
             expectBadRequiredBodyAttribute(updateResponse, "Birthday must be a date");
@@ -366,7 +366,7 @@ describe('patient endpoints', () => {
             expectBadRequiredBodyAttribute(updateResponse, "Main picture must be a url");
         });
 
-        test('failed to update a patient because there is no token', async () => {
+        test('failed to update a patient because there is no accessToken', async () => {
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -380,8 +380,8 @@ describe('patient endpoints', () => {
             expect(updateResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to update a patient because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+        test('failed to update a patient because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -389,13 +389,13 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), token, newPatient);
+            const updateResponse = await apiPutWithAuth(endpointUrl(initPatients[1].id), accessToken, newPatient);
             expectUnauthorizedResponse(updateResponse);
             expectTokenErrorMessageReceived(updateResponse);
         });
 
-        test('failed to update a patient because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
+        test('failed to update a patient because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
             const newPatient = {
                 name: "Simba",
                 weight: 38.4,
@@ -403,7 +403,7 @@ describe('patient endpoints', () => {
                 subspeciesId: initSubspecies[1].id,
                 ownerId: initOwners[1].id,
             };
-            const updateResponse = await after1s(apiPutWithAuth, endpointUrl(initPatients[1].id), token, newPatient);  // token expires after 1 second
+            const updateResponse = await after1s(apiPutWithAuth, endpointUrl(initPatients[1].id), accessToken, newPatient);  // accessToken expires after 1 second
             expectUnauthorizedResponse(updateResponse);
             expectTokenExpiredErrorMessageReceived(updateResponse);
         });
@@ -413,8 +413,8 @@ describe('patient endpoints', () => {
         const endpointUrl = (patientId) => `/patients/${patientId}`;
 
         test('patient deleted successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl(initPatients[1].id), token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl(initPatients[1].id), accessToken);
             expectSuccessfulRequestResponse(deleteResponse);
             const expectedBody = {
                 id: deleteResponse.body.id,
@@ -433,15 +433,15 @@ describe('patient endpoints', () => {
         });
 
         test('failed to delete a patient because the patient does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl(999), token);
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl(999), accessToken);
             expectNotFoundResponse(deleteResponse);
             const expectedBody = { message: 'Patient not found' };
             expect(deleteResponse.body).toEqual(expectedBody);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Patient, initPatients.length);
         });
 
-        test('failed to delete a patient because there is no token', async () => {
+        test('failed to delete a patient because there is no accessToken', async () => {
             const deleteResponse = await apiDelete(endpointUrl(initPatients[1].id));
             expectUnauthorizedResponse(deleteResponse);
             const expectedBody = { message: 'Not authorized' };
@@ -449,17 +449,17 @@ describe('patient endpoints', () => {
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Patient, initPatients.length);
         });
 
-        test('failed to delete a patient because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const deleteResponse = await apiDeleteWithAuth(endpointUrl(initPatients[1].id), token);
+        test('failed to delete a patient because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const deleteResponse = await apiDeleteWithAuth(endpointUrl(initPatients[1].id), accessToken);
             expectUnauthorizedResponse(deleteResponse);
             expectTokenErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Patient, initPatients.length);
         });
 
-        test('failed to delete a patient because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const deleteResponse = await after1s(apiDeleteWithAuth, endpointUrl(initPatients[1].id), token);  // token expires after 1 second
+        test('failed to delete a patient because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
+            const deleteResponse = await after1s(apiDeleteWithAuth, endpointUrl(initPatients[1].id), accessToken);  // accessToken expires after 1 second
             expectUnauthorizedResponse(deleteResponse);
             expectTokenExpiredErrorMessageReceived(deleteResponse);
             await expectLengthOfDatabaseInstancesToBeTheSameWith(Patient, initPatients.length);
@@ -470,8 +470,8 @@ describe('patient endpoints', () => {
         const endpointUrl = (patientId) => `/patients/${patientId}`;
 
         test('patient returned successfully', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
-            const getResponse = await apiGetWithAuth(endpointUrl(initPatients[1].id), token);
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
+            const getResponse = await apiGetWithAuth(endpointUrl(initPatients[1].id), accessToken);
             expectSuccessfulRequestResponse(getResponse);
             const expectedBody = {
                 id: getResponse.body.id,
@@ -489,30 +489,30 @@ describe('patient endpoints', () => {
         });
 
         test('failed to return a patient because the patient does not exist', async () => {
-            const token = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.token;
-            const getResponse = await apiGetWithAuth(endpointUrl(999), token);
+            const accessToken = (await apiLoginUser(initialUsers.find(p => p.email === initUsers[1].email))).body.accessToken;
+            const getResponse = await apiGetWithAuth(endpointUrl(999), accessToken);
             expectNotFoundResponse(getResponse);
             const expectedBody = { message: 'Patient not found' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return a patient because there is no token', async () => {
+        test('failed to return a patient because there is no accessToken', async () => {
             const getResponse = await apiGet(endpointUrl(initPatients[1].id));
             expectUnauthorizedResponse(getResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return a patient because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const getResponse = await apiGetWithAuth(endpointUrl(initPatients[1].id), token);
+        test('failed to return a patient because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const getResponse = await apiGetWithAuth(endpointUrl(initPatients[1].id), accessToken);
             expectUnauthorizedResponse(getResponse);
             expectTokenErrorMessageReceived(getResponse);
         });
 
-        test('failed to return a patient because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const getResponse = await after1s(apiGetWithAuth, endpointUrl(initPatients[1].id), token);  // token expires after 1 second
+        test('failed to return a patient because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
+            const getResponse = await after1s(apiGetWithAuth, endpointUrl(initPatients[1].id), accessToken);  // accessToken expires after 1 second
             expectUnauthorizedResponse(getResponse);
             expectTokenExpiredErrorMessageReceived(getResponse);
         });
@@ -522,29 +522,29 @@ describe('patient endpoints', () => {
         const endpointUrl = '/patients';
 
         test('all patients returned successfully', async () => {
-            const token = (await apiLoginUser(initialUsers[1])).body.token;
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+            const accessToken = (await apiLoginUser(initialUsers[1])).body.accessToken;
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectSuccessfulRequestResponse(getResponse);
             await expectSameArrayBody(getResponse.body, initialPatients, comparePatientFunc);
         });
 
-        test('failed to return all patients because there is no token', async () => {
+        test('failed to return all patients because there is no accessToken', async () => {
             const getResponse = await apiGet(endpointUrl);
             expectUnauthorizedResponse(getResponse);
             const expectedBody = { message: 'Not authorized' };
             expect(getResponse.body).toEqual(expectedBody);
         });
 
-        test('failed to return all patients because the token is not valid', async () => {
-            const token = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
-            const getResponse = await apiGetWithAuth(endpointUrl, token);
+        test('failed to return all patients because the accessToken is not valid', async () => {
+            const accessToken = 'invalidToken#74.a6sd56_78942.#sdad@dsaf';
+            const getResponse = await apiGetWithAuth(endpointUrl, accessToken);
             expectUnauthorizedResponse(getResponse);
             expectTokenErrorMessageReceived(getResponse);
         });
 
-        test('failed to return all patients because the token is expired', async () => {
-            const token = (await apiLoginTestUser(initialUsers[1])).body.token;
-            const getResponse = await after1s(apiGetWithAuth, endpointUrl, token);  // token expires after 1 second
+        test('failed to return all patients because the accessToken is expired', async () => {
+            const accessToken = (await apiLoginTestUser(initialUsers[1])).body.accessToken;
+            const getResponse = await after1s(apiGetWithAuth, endpointUrl, accessToken);  // accessToken expires after 1 second
             expectUnauthorizedResponse(getResponse);
             expectTokenExpiredErrorMessageReceived(getResponse);
         });

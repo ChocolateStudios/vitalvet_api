@@ -48,7 +48,7 @@ export const refreshToken = async (req, res) => {
 
     try {
         const tokenResponse = await AuthService.refreshToken(req.uid);
-        return res.status(200).json(tokenResponse);
+        return res.status(201).json(tokenResponse);
     } catch (error) {
         const { code, message } = exceptionResponse(error);
         return res.status(code).json({ message });

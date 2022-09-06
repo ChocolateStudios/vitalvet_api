@@ -84,7 +84,7 @@ router.put('/:medicineId', paramsMedicineValidator, bodyMedicineValidator, updat
 router.delete('/:medicineId', paramsMedicineValidator, deleteMedicine);
 
 /**
- * @swagger
+ * swagger
  * /api/v1/medicines/{medicineName}:
  *  get:
  *      summary: Get a medicine by name
@@ -105,7 +105,7 @@ router.delete('/:medicineId', paramsMedicineValidator, deleteMedicine);
  *                          type: object
  *                          $ref: '#/components/schemas/MedicineResponse'
  */
-router.get('/:medicineName', getMedicineByName);
+// router.get('/:medicineName', getMedicineByName);
 
 /**
  * @swagger

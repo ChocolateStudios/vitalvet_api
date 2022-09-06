@@ -110,11 +110,18 @@ router.delete('/', requireToken, deleteAccount);
 /**
  * @swagger
  * /api/v1/auth/refresh:
- *  get:
+ *  post:
  *      summary: Refresh the token of logged in user
  *      tags: [User]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      $ref: '#/components/schemas/RefreshTokenSubmission'
  *      responses:
- *          200:
+ *          201:
  *              description: Token refreshed
  *              content:
  *                  application/json:
@@ -122,7 +129,7 @@ router.delete('/', requireToken, deleteAccount);
  *                          type: object
  *                          $ref: '#/components/schemas/TokenResponse'
  */
-router.get('/refresh', requireRefreshToken, refreshToken);
+router.post('/refresh', requireRefreshToken, refreshToken);
 
 
 

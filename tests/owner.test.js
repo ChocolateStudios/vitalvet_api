@@ -1,7 +1,7 @@
 import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { Owner } from '../models/Owner.js';
-import { api, apiDelete, apiGet, apiPost, apiPut, compareOwnerFunc, ensureOnlyInitialInstancesExist, expectBadRequestResponse, expectBadRequiredBodyAttribute, expectLengthOfDatabaseInstancesToBeTheSameWith, expectNotFoundResponse, expectOnlyInitialInstancesInDatabase, expectSameArrayBody, expectSuccessfulCreation, expectSuccessfulRequestResponse, initialOwners } from './testCommon.js';
+import { apiDelete, apiGet, apiPost, apiPut, compareOwnerFunc, ensureOnlyInitialInstancesExist, expectBadRequestResponse, expectBadRequiredBodyAttribute, expectLengthOfDatabaseInstancesToBeTheSameWith, expectNotFoundResponse, expectOnlyInitialInstancesInDatabase, expectSameArrayBody, expectSuccessfulCreation, expectSuccessfulRequestResponse, initialOwners } from './testCommon.js';
 
 let initOwners = [];
 

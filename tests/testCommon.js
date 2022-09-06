@@ -343,6 +343,15 @@ export const initialPatients = [
     },
 ]
 
+export const initialEventTypes = [
+    { name: "Baños", typeColor: "#FF0000" },
+    { name: "Vacunas", typeColor: "#00FF00" },
+]
+
+export const initialMedicines = [
+    { name: "Apronax" }, { name: "Boombap" },
+]
+
 
 
 
@@ -455,6 +464,17 @@ export const comparePatientFunc = async (patientInDatabase, initialPatient) => {
     const sameDayOfDeath = patientInDatabase.dayOfDeath === initialPatient.dayOfDeath;
     const sameMainPicture = patientInDatabase.mainPicture === initialPatient.mainPicture;
     return sameName && sameDayOfDeath && sameMainPicture;
+};
+
+export const compareEventTypeFunc = async (eventTypeInDatabase, initialEventType) => {
+    const sameName = eventTypeInDatabase.name === initialEventType.name;
+    const sameTypeColor = eventTypeInDatabase.typeColor === initialEventType.typeColor;
+    return sameName && sameTypeColor;
+};
+
+export const compareMedicineFunc = async (medicineInDatabase, initialMedicine) => {
+    const sameName = medicineInDatabase.name === initialMedicine.name;
+    return sameName;
 };
 
 

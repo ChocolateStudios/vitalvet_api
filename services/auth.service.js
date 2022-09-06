@@ -69,8 +69,8 @@ export class AuthService {
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const { token, expiresIn } = generateToken(id);
-        return { token, expiresIn };
+        const { accessToken, expiresIn } = generateToken(id);
+        return { accessToken, expiresIn };
     };
 
     static logout (res) {

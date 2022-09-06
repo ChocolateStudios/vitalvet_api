@@ -2,7 +2,7 @@ import { sequelize } from '../database/connectdb.js';
 import { server } from "../index.js";
 import { Profile } from '../models/Profile.js';
 import { User } from '../models/User.js';
-import { api, initialProfiles, initialUsers } from './testCommon.js';
+import { initialProfiles, initialUsers } from './testCommon.js';
 
 let iUsers = [];
 let iProfiles = [];

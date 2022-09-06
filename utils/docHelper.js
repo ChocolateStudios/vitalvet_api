@@ -21,6 +21,16 @@
  *          accessToken: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
  *          expiresIn: 900
  * 
+ *      RefreshTokenSubmission:
+ *        type: object
+ *        properties:
+ *         refreshToken:
+ *          type: string
+ *        required:
+ *          - refreshToken
+ *        example:
+ *          refreshToken: eyJhbGciOi1NiIsIVCJ9.aWQiOjlhdCI6Y1OTISwiZXhwIxNQ5fQ.RpvhB4XId-sVJ823lpjDe5AlE
+ * 
  *      TokenWithRefreshResponse:
  *        type: object
  *        properties:
