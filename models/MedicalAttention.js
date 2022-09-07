@@ -68,6 +68,7 @@ MedicalAttention.init({
 }, {
     sequelize,
     modelName: 'medicalAttention',
-    timestamps: false,
+    timestamps: true,
+    updatedAt: false,
     underscored: true
 });

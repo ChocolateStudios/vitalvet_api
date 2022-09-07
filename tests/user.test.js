@@ -143,15 +143,24 @@ describe('user enpoints', () => {
         });
     });
 
-    describe('refresh an access token', () => {
+    describe('refresh an accessToken', () => {
         const endpointUrl = '/auth/refresh';
 
-        test('token refreshed successfully', async () => {
+        test('accessToken refreshed successfully', async () => {
             const refreshToken = (await apiLoginTestUser(initialUsers[1])).body.refreshToken;
             const postResponse = await after1s(apiPost, endpointUrl, { refreshToken });  // accessToken expires after 1 second
             expectSuccessfulCreation(postResponse);
             expect(postResponse.body.expiresIn).toBe(900);
             expect(postResponse.body.accessToken.length).toBeGreaterThan(0);
+        });
+
+        test('failed to refresh an accessToken because the user does not exist', async () => {
+            const { accessToken, refreshToken } = (await apiLoginTestUser(initialUsers[1])).body;
+            await apiDeleteWithAuth('/auth', accessToken);
+            const postResponse = await after1s(apiPost, endpointUrl, { refreshToken });  // accessToken expires after 1 second
+            expectNotFoundResponse(postResponse);
+            const expectedBody = { message: 'Invalid user' };
+            expect(postResponse.body).toEqual(expectedBody);
         });
     });
 });

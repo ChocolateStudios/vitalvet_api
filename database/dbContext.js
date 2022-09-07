@@ -18,7 +18,8 @@ import { MedicalAttention } from "../models/MedicalAttention.js";
 ***************** Relationships *****************
 *************************************************/
 
-// One-to-one relationship between User and Profile with foreign key 'userId' in profile
+
+// One-to-one relationship between User and Profile with foreign key 'userId' in Profile
 User.hasOne(Profile, {
     foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "profile"
@@ -27,6 +28,7 @@ Profile.belongsTo(User, {
     foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "user"
 });
+
 
 
 // One-to-many relationship between Species and Species with foreign key 'speciesId' in Species
@@ -39,6 +41,8 @@ Species.belongsTo(Species, {
     onDelete: "CASCADE", onUpdate: "CASCADE", as: "species"
 });
 
+
+
 // One-to-many relationship between Species and Patient with foreign key 'speciesId' in Patient
 Species.hasMany(Patient, {
     foreignKey: { name: 'subspeciesId', allowNull: false },
@@ -48,7 +52,6 @@ Patient.belongsTo(Species, {
     foreignKey: { name: 'subspeciesId', allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "subspecies"
 });
-
 
 // One-to-many relationship between Owner and Patient with foreign key 'ownerId' in Patient
 Owner.hasMany(Patient, {
@@ -60,7 +63,6 @@ Patient.belongsTo(Owner, {
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "owner"
 });
 
-
 // One-to-many relationship between Profile and Patient with foreign key 'profileId' in Patient
 Profile.hasMany(Patient, {
     foreignKey: { name: "profileId", allowNull: false },
@@ -70,6 +72,7 @@ Patient.belongsTo(Profile, {
     foreignKey: { name: "profileId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "profile"
 });
+
 
 
 // One-to-many relationship between Patient and Event with foreign key 'patientId' in Event
@@ -103,6 +106,7 @@ Event.belongsTo(EventType, {
 });
 
 
+
 // One-to-many relationship between Patient and DocumentFile with foreign key 'patientId' in DocumentFile
 Patient.hasMany(DocumentFile, {
     foreignKey: { name: "patientId", allowNull: true },
@@ -121,6 +125,28 @@ MedicalAttention.hasMany(DocumentFile, {
 DocumentFile.belongsTo(MedicalAttention, {
     foreignKey: { name: "medicalAttentionId", allowNull: true },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttention"
+});
+
+
+
+// One-to-many relationship between Patient and MedicalAttention with foreign key 'patientId' in MedicalAttention
+Patient.hasMany(MedicalAttention, {
+    foreignKey: { name: "patientId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttentions"
+});
+MedicalAttention.belongsTo(Patient, {
+    foreignKey: { name: "patientId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patient"
+});
+
+// One-to-many relationship between Profile and MedicalAttention with foreign key 'profileId' in MedicalAttention
+Profile.hasMany(MedicalAttention, {
+    foreignKey: { name: "profileId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttentions"
+});
+MedicalAttention.belongsTo(Profile, {
+    foreignKey: { name: "profileId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "profile"
 });
 
 

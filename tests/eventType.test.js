@@ -11,7 +11,7 @@ describe('event type endpoints', () => {
     });
 
     describe('test scenary ready', () => {
-        test('expected initial event types', async () => {
+        test('expected initial eventTypes', async () => {
             await expectOnlyInitialInstancesInDatabase(EventType, initialEventTypes, compareEventTypeFunc);
         });
     });

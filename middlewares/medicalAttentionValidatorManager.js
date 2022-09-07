@@ -24,21 +24,15 @@ export const bodyMedicalAttentionValidator = [
     body('resultNotes')
         .trim()
         .notEmpty()
-        .withMessage('Result Notes are required')
+        .withMessage('Result notes are required')
         .isLength({ max: Constants.MULTILINE_SIZE })
-        .withMessage(`Result Notes must be at most ${Constants.MULTILINE_SIZE} characters`),
+        .withMessage(`Result notes must be at most ${Constants.MULTILINE_SIZE} characters`),
     body('patientId')
         .trim()
         .notEmpty()
         .withMessage('Patient id is required')
         .isInt()
         .withMessage('Patient id must be an integer'),
-    body('profileId')
-        .trim()
-        .notEmpty()
-        .withMessage('Profile id is required')
-        .isInt()
-        .withMessage('Profile id must be an integer'),
         validationResultExpress
 ]
 

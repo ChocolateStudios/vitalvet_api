@@ -13,6 +13,7 @@ import eventTypeRouter from "./routes/eventTypes.route.js";
 import eventRouter from "./routes/events.route.js";
 import medicinesRouter from "./routes/medicines.route.js";
 import documentFilesRouter from "./routes/documentFiles.route.js";
+import medicalAttentionsRouter from "./routes/medicalAttentions.route.js";
 import "./database/dbContext.js";
 
 export const app = express();
@@ -59,7 +60,8 @@ app.use('/api/v1/owners', ownersRouter);
 app.use('/api/v1/eventTypes', eventTypeRouter);
 app.use('/api/v1/events', eventRouter);
 app.use('/api/v1/medicines', medicinesRouter);
-app.use('/api/v1', documentFilesRouter);
+app.use('/api/v1/documentFiles', documentFilesRouter);
+app.use('/api/v1/medicalAttentions', medicalAttentionsRouter);
 
 
 app.use(express.static('public'));

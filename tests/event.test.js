@@ -13,8 +13,6 @@ const initialSpeciesAndSubspecies = initialSpecies.concat(initialSubspecies);
 
 let initUsers = [];
 let initProfiles = [];
-let initOwners = [];
-let initSubspecies = [];
 let initPatients = [];
 let initEventTypes = [];
 let initEvents = [];
@@ -24,13 +22,11 @@ describe('event endpoints', () => {
         initUsers = await ensureOnlyInitialInstancesExist(User, initialUsers, compareUserFunc);
         initProfiles = await ensureOnlyInitialInstancesExist(Profile, initialProfiles, compareProfileFunc);
         await ensureOnlyInitialInstancesExist(Species, initialSpecies, compareSpeciesFunc);
-        initSubspecies = await ensureOnlyInitialInstancesExist(Species, initialSpeciesAndSubspecies, compareSpeciesFunc);
-        initOwners = await ensureOnlyInitialInstancesExist(Owner, initialOwners, compareOwnerFunc);
+        await ensureOnlyInitialInstancesExist(Species, initialSpeciesAndSubspecies, compareSpeciesFunc);
+        await ensureOnlyInitialInstancesExist(Owner, initialOwners, compareOwnerFunc);
         initPatients = await ensureOnlyInitialInstancesExist(Patient, initialPatients, comparePatientFunc);
         initEventTypes = await ensureOnlyInitialInstancesExist(EventType, initialEventTypes, compareEventTypeFunc);
         initEvents = await ensureOnlyInitialInstancesExist(Event, initialEvents, compareEventFunc);
-
-        initSubspecies = initSubspecies.filter(s => (s.speciesId));
     });
 
     describe('test scenary ready', () => {
@@ -54,7 +50,7 @@ describe('event endpoints', () => {
             await expectOnlyInitialInstancesInDatabase(Patient, initialPatients, comparePatientFunc);
         });
 
-        test('expected initial event types', async () => {
+        test('expected initial eventTypes', async () => {
             await expectOnlyInitialInstancesInDatabase(EventType, initialEventTypes, compareEventTypeFunc);
         });
 

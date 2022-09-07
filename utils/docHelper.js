@@ -314,6 +314,38 @@
  *        type: string
  *        enum: ['IMAGE_JPG', 'IMAGE_PNG', 'IMAGE_SVG', 'TEXT_TXT', 'TEXT_PDF', 'TEXT_WORD', 'SPREADSHEET_EXCEL', 'PRESENTATION_PPT']
  * 
+ *      MedicalAttentionSubmission:
+ *        type: object
+ *        properties:
+ *          weight:
+ *           type: number
+ *          description:
+ *           type: string
+ *          date:
+ *           type: date
+ *          resultNotes:
+ *           type: string
+ *          patientId:
+ *           type: integer
+ *        required:
+ *          - weight
+ *          - description
+ *          - date
+ *          - resultNotes
+ *          - patientId
+ *        example:
+ *          weight: 25.5
+ *          description: Tiene dolores en la cola
+ *          date: 2022-03-17
+ *          resultNotes: Lo pisaron muy fuerte, colocarle crema todos los dias
+ *          patientId: 1
+ * 
+ *      MedicalAttentionListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/MedicalAttentionResponse' 
+ * 
  * 
  * 
  * 

@@ -393,6 +393,37 @@ export const initialEvents = [
     },
 ]
 
+export const initialMedicalAttentions = [
+    { 
+        weight: 40,
+        description: "El paciente tiene dolor de cola",
+        date: "2019-03-17",
+        resultNotes: "No hay cura",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Pepe' } });
+            return { name: "patientId", value: patient.id };
+        },
+        replaceWithFuncProfileId: async () => {
+            const profile = await Profile.findOne({ where: { name: 'Primer' } });
+            return { name: "profileId", value: profile.id };
+        }
+    },
+    { 
+        weight: 71,
+        description: "El paciente está muy chistoso",
+        date: "2020-09-26",
+        resultNotes: "Debe ser vacunado",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Tito' } });
+            return { name: "patientId", value: patient.id };
+        },
+        replaceWithFuncProfileId: async () => {
+            const profile = await Profile.findOne({ where: { name: 'Segundo' } });
+            return { name: "profileId", value: profile.id };
+        }
+    },
+]
+
 
 
 
@@ -522,6 +553,13 @@ export const compareEventFunc = async (eventInDatabase, initialEvent) => {
     const sameTitle = eventInDatabase.title === initialEvent.title;
     const sameDescription = eventInDatabase.description === initialEvent.description;
     return sameTitle && sameDescription;
+};
+
+export const compareMedicalAttentionFunc = async (medicalAttentionInDatabase, initialMedicalAttention) => {
+    const sameWeight = medicalAttentionInDatabase.weight === initialMedicalAttention.weight;
+    const sameDescription = medicalAttentionInDatabase.description === initialMedicalAttention.description;
+    const sameResultNotes = medicalAttentionInDatabase.resultNotes === initialMedicalAttention.resultNotes;
+    return sameWeight && sameDescription && sameResultNotes;
 };
 
 
