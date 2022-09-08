@@ -11,6 +11,7 @@ import { Event } from "../models/Event.js";
 import { Medicine } from "../models/Medicine.js";
 import { DocumentFile } from "../models/DocumentFile.js";
 import { MedicalAttention } from "../models/MedicalAttention.js";
+import { MedicalAttentionMedicine } from "../models/MedicalAttentionMedicine.js";
 
 
 
@@ -147,6 +148,20 @@ MedicalAttention.hasMany(DocumentFile, {
 DocumentFile.belongsTo(MedicalAttention, {
     foreignKey: { name: "medicalAttentionId", allowNull: true },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttention"
+});
+
+
+
+// Many-to-many relationship between MedicalAttention and Medicine as MedicalAttentionMedicine with foreign keys 'medicalAttentionId' and 'medicineId'
+MedicalAttention.belongsToMany(Medicine, {
+    through: MedicalAttentionMedicine,
+    foreignKey: { name: "medicalAttentionId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicines"
+});
+Medicine.belongsToMany(MedicalAttention, {
+    through: MedicalAttentionMedicine,
+    foreignKey: { name: "medicineId", allowNull: false },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttentions"
 });
 
 

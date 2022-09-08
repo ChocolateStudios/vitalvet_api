@@ -358,6 +358,22 @@
  *          type: object
  *          $ref: '#/components/schemas/MedicalAttentionResponse' 
  * 
+ *      MedicalAttentionMedicineSubmission:
+ *        type: object
+ *        properties:
+ *          details:
+ *           type: string
+ *        required:
+ *          - details
+ *        example:
+ *          details: 3 veces al día, mañana, tarde y noche
+ * 
+ *      MedicalAttentionMedicineListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/MedicalAttentionMedicineResponse'
+ * 
  * 
  * 
  * 
