@@ -107,28 +107,6 @@ Event.belongsTo(EventType, {
 
 
 
-// One-to-many relationship between Patient and DocumentFile with foreign key 'patientId' in DocumentFile
-Patient.hasMany(DocumentFile, {
-    foreignKey: { name: "patientId", allowNull: true },
-    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
-});
-DocumentFile.belongsTo(Patient, {
-    foreignKey: { name: "patientId", allowNull: true },
-    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patient"
-});
-
-// One-to-many relationship between MedicalAttention and DocumentFile with foreign key 'medicalAttentionId' in DocumentFile
-MedicalAttention.hasMany(DocumentFile, {
-    foreignKey: { name: "medicalAttentionId", allowNull: true },
-    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
-});
-DocumentFile.belongsTo(MedicalAttention, {
-    foreignKey: { name: "medicalAttentionId", allowNull: true },
-    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttention"
-});
-
-
-
 // One-to-many relationship between Patient and MedicalAttention with foreign key 'patientId' in MedicalAttention
 Patient.hasMany(MedicalAttention, {
     foreignKey: { name: "patientId", allowNull: false },
@@ -147,6 +125,28 @@ Profile.hasMany(MedicalAttention, {
 MedicalAttention.belongsTo(Profile, {
     foreignKey: { name: "profileId", allowNull: false },
     onDelete: 'CASCADE', onUpdate: "CASCADE", as: "profile"
+});
+
+
+
+// One-to-many relationship between Patient and DocumentFile with foreign key 'patientId' in DocumentFile
+Patient.hasMany(DocumentFile, {
+    foreignKey: { name: "patientId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
+});
+DocumentFile.belongsTo(Patient, {
+    foreignKey: { name: "patientId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "patient"
+});
+
+// One-to-many relationship between MedicalAttention and DocumentFile with foreign key 'medicalAttentionId' in DocumentFile
+MedicalAttention.hasMany(DocumentFile, {
+    foreignKey: { name: "medicalAttentionId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "documentFiles"
+});
+DocumentFile.belongsTo(MedicalAttention, {
+    foreignKey: { name: "medicalAttentionId", allowNull: true },
+    onDelete: 'CASCADE', onUpdate: "CASCADE", as: "medicalAttention"
 });
 
 

@@ -4,6 +4,7 @@ import { Constants } from '../constants/constants.js';
 
 export const bodyDocumentFileValidator = [
     body('name')
+        .if(body('name').exists())
         .trim()
         .notEmpty()
         .withMessage('Name is required')
@@ -32,7 +33,8 @@ export const paramsPatientDocumentFileValidator = [
         .notEmpty()
         .withMessage('Patient id is required')
         .isInt()
-        .withMessage('Patient id must be an integer'),
+        .withMessage('Patient id must be an integer')
+        .toInt(),
     validationResultExpress
 ]
 
@@ -42,6 +44,18 @@ export const paramsMedicalAttentionDocumentFileValidator = [
         .notEmpty()
         .withMessage('Medical attention id is required')
         .isInt()
-        .withMessage('Medical attention id must be an integer'),
+        .withMessage('Medical attention id must be an integer')
+        .toInt(),
+    validationResultExpress
+]
+
+export const paramsGeneralDocumentFileValidator = [
+    param('documentFileId')
+        .trim()
+        .notEmpty()
+        .withMessage('Document file id is required')
+        .isInt()
+        .withMessage('Document file id must be an integer')
+        .toInt(),
     validationResultExpress
 ]

@@ -314,6 +314,18 @@
  *        type: string
  *        enum: ['IMAGE_JPG', 'IMAGE_PNG', 'IMAGE_SVG', 'TEXT_TXT', 'TEXT_PDF', 'TEXT_WORD', 'SPREADSHEET_EXCEL', 'PRESENTATION_PPT']
  * 
+ *      PatientDocumentFileListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/PatientDocumentFileResponse' 
+ * 
+ *      MedicalAttentionDocumentFileListResponse:
+ *        type: array
+ *        items:
+ *          type: object
+ *          $ref: '#/components/schemas/MedicalAttentionDocumentFileResponse' 
+ * 
  *      MedicalAttentionSubmission:
  *        type: object
  *        properties:

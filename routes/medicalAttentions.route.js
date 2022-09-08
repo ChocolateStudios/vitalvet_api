@@ -100,7 +100,7 @@ router.delete('/:medicalAttentionId', requireToken, deleteMedicalAttention);
 * @swagger
 * /api/v1/medicalAttentions/{medicalAttentionId}:
 *  get:
-*      summary: Get medical attention by id
+*      summary: Get a medical attention by id
 *      tags: [MedicalAttentions]
 *      security:
 *          - BearerAuth: []

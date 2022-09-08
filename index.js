@@ -60,7 +60,7 @@ app.use('/api/v1/owners', ownersRouter);
 app.use('/api/v1/eventTypes', eventTypeRouter);
 app.use('/api/v1/events', eventRouter);
 app.use('/api/v1/medicines', medicinesRouter);
-app.use('/api/v1/documentFiles', documentFilesRouter);
+app.use('/api/v1', documentFilesRouter);
 app.use('/api/v1/medicalAttentions', medicalAttentionsRouter);
 
 

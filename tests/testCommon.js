@@ -7,6 +7,7 @@ import { Owner } from "../models/Owner.js";
 import { Profile } from "../models/Profile.js";
 import { Patient } from "../models/Patient.js";
 import { EventType } from "../models/EventType.js";
+import { MedicalAttention } from "../models/MedicalAttention.js";
 
 jest.setTimeout(60000); // 60 seconds
 export const api = supertest(app);
@@ -424,6 +425,64 @@ export const initialMedicalAttentions = [
     },
 ]
 
+export const initialPatientDocumentFiles = [
+    { 
+        name: "foto perfil",
+        link: "https://www.example.com/image.png",
+        type: "IMAGE_PNG",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Pepe' } });
+            return { name: "patientId", value: patient.id };
+        },
+    },
+    { 
+        link: "https://www.example.com/image2.jpg",
+        type: "IMAGE_JPG",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Tito' } });
+            return { name: "patientId", value: patient.id };
+        },
+    },
+    { 
+        name: "otra foto",
+        link: "https://www.example.com/image3.svg",
+        type: "IMAGE_SVG",
+        replaceWithFuncPatientId: async () => {
+            const patient = await Patient.findOne({ where: { name: 'Pepe' } });
+            return { name: "patientId", value: patient.id };
+        },
+    },
+]
+
+export const initialMedicalAttentionDocumentFiles = [
+    { 
+        name: "foto primera atención",
+        link: "https://www.example.com/imageSiu.png",
+        type: "IMAGE_PNG",
+        replaceWithFuncMedicalAttentionId: async () => {
+            const medicalAttention = await MedicalAttention.findOne({ where: { weight: 40 } });
+            return { name: "medicalAttentionId", value: medicalAttention.id };
+        },
+    },
+    { 
+        link: "https://www.example.com/imageSiu2.jpg",
+        type: "IMAGE_JPG",
+        replaceWithFuncMedicalAttentionId: async () => {
+            const medicalAttention = await MedicalAttention.findOne({ where: { weight: 71 } });
+            return { name: "medicalAttentionId", value: medicalAttention.id };
+        },
+    },
+    { 
+        name: "otra foto atención",
+        link: "https://www.example.com/imageSiu3.svg",
+        type: "IMAGE_SVG",
+        replaceWithFuncMedicalAttentionId: async () => {
+            const medicalAttention = await MedicalAttention.findOne({ where: { weight: 40 } });
+            return { name: "medicalAttentionId", value: medicalAttention.id };
+        },
+    },
+]
+
 
 
 
@@ -479,6 +538,12 @@ export const ensureOnlyInitialInstancesExist = async (Model, initialInstances, c
         }
     }
     return instancesInDatabase;
+}
+
+export const ensureInitialInstancesChangesWereDetected = async (initialInstances) => {
+    let _initialInstances = initialInstances.map(element => { return { ...element } });
+    await detectInitialInstancesChanges(_initialInstances);
+    return _initialInstances;
 }
 
 
@@ -560,6 +625,12 @@ export const compareMedicalAttentionFunc = async (medicalAttentionInDatabase, in
     const sameDescription = medicalAttentionInDatabase.description === initialMedicalAttention.description;
     const sameResultNotes = medicalAttentionInDatabase.resultNotes === initialMedicalAttention.resultNotes;
     return sameWeight && sameDescription && sameResultNotes;
+};
+
+export const compareDocumentFileFunc = async (documentFileInDatabase, initialDocumentFile) => {
+    const sameLink = documentFileInDatabase.link === initialDocumentFile.link;
+    const sameType = documentFileInDatabase.type === initialDocumentFile.type;
+    return sameLink && sameType;
 };
 
 
