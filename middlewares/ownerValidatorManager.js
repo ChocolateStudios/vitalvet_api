@@ -34,7 +34,7 @@ export const bodyOwnerValidator = [
         .isLength({ max: 15 })
         .withMessage(`Direction must be at most 15 characters`),
     body('dni')
-        .if(body('dni').exists())
+        .if(body('dni').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Dni is required')
@@ -43,7 +43,7 @@ export const bodyOwnerValidator = [
         .isLength({ max: 15 })
         .withMessage(`Dni must be at most 15 characters`),
     body('email')
-        .if(body('email').exists())
+        .if(body('email').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Email is required')

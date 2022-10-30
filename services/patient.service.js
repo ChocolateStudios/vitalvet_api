@@ -3,6 +3,7 @@ import { Owner } from "../models/Owner.js";
 import { Patient } from "../models/Patient.js";
 import { Profile } from "../models/Profile.js";
 import { Species } from "../models/Species.js";
+import { PatientRepository } from "../repositories/patient.repository.js";
 import { SpeciesRepository } from "../repositories/species.repository.js";
 
 export class PatientService {
@@ -75,7 +76,8 @@ export class PatientService {
     }
     
     static async getPatientById(id) {
-        const patient = await Patient.findOne({ where: { id } });
+        // const patient = await Patient.findOne({ where: { id } });
+        const patient = await PatientRepository.getPatientWithAttributesById(id);
 
         if (!patient)
             throw customException(404, "Patient not found");

@@ -22,14 +22,14 @@ export const bodyPatientValidator = [
         .isDate()
         .withMessage('Birthday must be a date'),
     body('dayOfDeath')
-        .if(body('dayOfDeath').exists())
+        .if(body('dayOfDeath').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Day of death is required')
         .isDate()
         .withMessage('Day of death must be a date'),
     body('mainPicture')
-        .if(body('mainPicture').exists())
+        .if(body('mainPicture').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Main picture is required')

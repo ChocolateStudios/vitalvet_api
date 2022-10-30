@@ -22,14 +22,14 @@ export const bodyEventValidator = [
         .isISO8601()
         .withMessage('Start time must be a date time'),
     body('endTime')
-        .if(body('endTime').exists())
+        .if(body('endTime').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('End time is required')
         .isISO8601()
         .withMessage('End time must be a date time'),
     body('patientId')
-        .if(body('patientId').exists())
+        .if(body('patientId').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Patient id is required')

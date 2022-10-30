@@ -4,7 +4,7 @@ import { Constants } from '../constants/constants.js';
 
 export const bodyDocumentFileValidator = [
     body('name')
-        .if(body('name').exists())
+        .if(body('name').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Name is required')

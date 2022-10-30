@@ -22,7 +22,7 @@ export const bodyProfileValidator = [
         .isDate()
         .withMessage('Birthday must be a date'),
     body('picture')
-        .if(body('picture').exists())
+        .if(body('picture').exists({checkNull: true}))
         .trim()
         .notEmpty()
         .withMessage('Picture is required')
@@ -31,7 +31,7 @@ export const bodyProfileValidator = [
         .isLength({ max: Constants.LINK_SIZE })
         .withMessage(`Picture must be at most ${Constants.LINK_SIZE} characters`),
     body('admin')
-        .if(body('admin').exists())
+        .if(body('admin').exists({checkNull: true}))
         .trim()
         .isBoolean()
         .withMessage('Admin must be a boolean'),
