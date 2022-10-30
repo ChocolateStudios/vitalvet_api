@@ -1,10 +1,11 @@
 import { customException } from "../exceptions/exceptionResponse.js";
 import { User } from "../models/User.js";
+import { UserRepository } from "../repositories/user.repository.js";
 import { generateRefreshToken, generateTestToken, generateToken } from "../utils/tokenManager.js";
 
 export class AuthService {
     static async register(email, password, res) {
-        const userCreated = await User.findOne({ where: { email } });
+        const userCreated = await UserRepository.getUserByEmail(email);
 
         if (userCreated)
             throw new customException(400, "User already exists with this email");
@@ -19,7 +20,7 @@ export class AuthService {
     }
 
     static async login (email, password, res) {
-        const user = await User.findOne({ where: { email } });
+        const user = await UserRepository.getUserByEmail(email);
         
         if (!user)
             throw new customException(404, "Invalid email or password");
@@ -36,7 +37,7 @@ export class AuthService {
     };
 
     static async testingLogin (email, password, res) {
-        const user = await User.findOne({ where: { email } });
+        const user = await UserRepository.getUserByEmail(email);
         
         if (!user)
             throw new customException(404, "Invalid email or password");
@@ -53,7 +54,7 @@ export class AuthService {
     };
 
     static async deleteAccount (id) {
-        const user = await User.findOne({ where: { id } });
+        const user = await UserRepository.getUserById(id);
 
         if (!user)
             throw new customException(404, "Invalid user");
@@ -64,7 +65,7 @@ export class AuthService {
     };
 
     static async refreshToken (id) {
-        const user = await User.findOne({ where: { id } });
+        const user = await UserRepository.getUserById(id);
 
         if (!user)
             throw new customException(404, "Invalid user");
