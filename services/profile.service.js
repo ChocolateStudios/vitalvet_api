@@ -2,15 +2,16 @@ import { customException } from "../exceptions/exceptionResponse.js";
 import { Profile } from "../models/Profile.js";
 import { User } from "../models/User.js";
 import { ProfileRepository } from "../repositories/profile.repository.js";
+import { UserRepository } from "../repositories/user.repository.js";
 
 export class ProfileService {
     static async createProfile(body, userId) {
-        const user = await User.findOne({ where: { id: userId } });
+        const user = await UserRepository.getUserById(userId);
 
         if (!user)
             throw new customException(404, "Invalid user");
 
-        const profileCreated = await Profile.findOne({ where: { userId } });
+        const profileCreated = await ProfileRepository.getProfileByUserId(userId);
 
         if (profileCreated)
             throw new customException(400, "Profile already exists for this user");
@@ -18,23 +19,26 @@ export class ProfileService {
         const { name, lastname, birthday, picture, college, review } = body;
         const admin = false;
 
-        let profile = Profile.build({ name, lastname, birthday, picture, admin, college, review, userId });
-        await profile.save();
+        const profile = await ProfileRepository.createProfile(name, lastname, birthday, picture, admin, college, review, userId);
+        return profile;
 
-        return {
-            id: profile.id,
-            name: profile.name,
-            lastname: profile.lastname,
-            birthday: profile.birthday,
-            picture: profile.picture ? profile.picture : null,
-            admin: profile.admin,
-            college: profile.college,
-            review: profile.review,
-            user: {
-                id: user.id,
-                email: user.email
-            }
-        };
+        // let profile = Profile.build({ name, lastname, birthday, picture, admin, college, review, userId });
+        // await profile.save();
+
+        // return {
+        //     id: profile.id,
+        //     name: profile.name,
+        //     lastname: profile.lastname,
+        //     birthday: profile.birthday,
+        //     picture: profile.picture ? profile.picture : null,
+        //     admin: profile.admin,
+        //     college: profile.college,
+        //     review: profile.review,
+        //     user: {
+        //         id: user.id,
+        //         email: user.email
+        //     }
+        // };
     }
 
     static async updateProfile(body, userId) {
