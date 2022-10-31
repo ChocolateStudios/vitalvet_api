@@ -3,25 +3,6 @@ import { sequelize } from '../database/connectdb.js';
 import { Constants } from '../constants/constants.js';
 import bcryptjs from 'bcryptjs';
 
-/**
- * @swagger
- * components:
- *  schemas:
- *      UserResponse:
- *        type: object
- *        properties:
- *         email:
- *          type: string
- *         password:
- *          type: string
- *        required:
- *          - email
- *          - password
- *        example:
- *          email: hello@example.com
- *          password: f5Haa8#asD
- */
-
 export class User extends Model {
     async comparePassword(candidatePassword) {
         return await bcryptjs.compare(candidatePassword, this.password);
